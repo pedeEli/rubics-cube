@@ -33,6 +33,9 @@ abstract class Vector<V> {
     public get normalized() {
         return this.scale(1 / this.mag)
     }
+    public get negate() {
+        return this.scale(-1)
+    }
 }
 class V3 extends Vector<V3> implements Uniform {
     public constructor(public x: number, public y: number, public z: number) {
@@ -56,9 +59,8 @@ class V3 extends Vector<V3> implements Uniform {
     public toArray() {
         return [this.x, this.y, this.z]
     }
-    public setUniform(gl: WebGL2RenderingContext, program: WebGLUniformLocation): void {
-        const data = new Float32Array(this.toArray())
-        gl.uniform3fv(location, data)
+    public setUniform(gl: WebGL2RenderingContext, location: WebGLUniformLocation): void {
+        gl.uniform3f(location, this.x, this.y, this.z)
     }
 }
 class V4 extends Vector<V4> implements Uniform {
@@ -80,9 +82,8 @@ class V4 extends Vector<V4> implements Uniform {
     public toArray() {
         return [this.x, this.y, this.z, this.w]
     }
-    public setUniform(gl: WebGL2RenderingContext, program: WebGLUniformLocation): void {
-        const data = new Float32Array(this.toArray())
-        gl.uniform4fv(location, data)
+    public setUniform(gl: WebGL2RenderingContext, location: WebGLUniformLocation): void {
+        gl.uniform4f(location, this.x, this.y, this.z, this.w)
     }
 }
 
@@ -165,8 +166,7 @@ class Quaternion {
         const im = axis.normalized.scale(Math.sin(half))
         return new Quaternion(real, im)
     }
-
-    public toMatrix() {
+    public get matrix() {
         const {x, y, z} = this.im
         const w = this.real
         const xx = x * x
@@ -185,9 +185,33 @@ class Quaternion {
             new V4(            0,             0,                 0, 1)
         )
     }
-
     public mult({real, im}: Quaternion) {
         return new Quaternion(this.real * real - this.im.dot(im), this.im.cross(im).add(im.scale(this.real)).add(this.im.scale(real)))
+    }
+    public rotate(v: V3) {
+        return new Quaternion(this.real, this.im.negate).mult(new Quaternion(0, v)).mult(this).im
+    }
+}
+
+class Transform {
+    public constructor(public position: V3, public rotation: Quaternion, public scale: V3) {}
+
+    public get matrix() {
+        const p = this.position
+        const s = this.scale
+        return new M44(
+            new V4(1, 0, 0, p.x),
+            new V4(0, 1, 0, p.y),
+            new V4(0, 0, 1, p.z),
+            new V4(0, 0, 0, 1)
+        )
+        .mult(this.rotation.matrix)
+        .mult(new M44(
+            new V4(s.x, 0, 0, 0),
+            new V4(0, s.y, 0, 0),
+            new V4(0, 0, s.z, 0),
+            new V4(0, 0, 0,   1)
+        ))
     }
 }
 

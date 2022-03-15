@@ -1,6 +1,6 @@
 import './style.css'
 
-import {Program} from './Program'
+import {Program, UniformFloat} from './Program'
 import {lookAt, perspective, Quaternion, V3} from './Math'
 import {vertex, fragment} from './shader/cube.glsl'
 
@@ -15,10 +15,10 @@ program.use()
 
 
 const vertices = [
-    1,  1,  0,
-    1, -1,  0,
-   -1,  1,  0,
-   -1, -1,  0
+    1,  1,  0,    0, 0, 1,
+    1, -1,  0,    0, 0, 1,
+   -1,  1,  0,    0, 0, 1,
+   -1, -1,  0,    0, 0, 1
 ]
 const verticesBuffer = new Float32Array(vertices)
 const vbo = gl.createBuffer()!
@@ -40,8 +40,18 @@ gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indicesBuffer, gl.STATIC_DRAW)
 gl.bindBuffer(gl.ARRAY_BUFFER, vbo)
 gl.bufferData(gl.ARRAY_BUFFER, verticesBuffer, gl.STATIC_DRAW)
 
-gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 12, 0)
+gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 24, 0)
 gl.enableVertexAttribArray(0)
+gl.vertexAttribPointer(1, 3, gl.FLOAT, false, 24, 12)
+gl.enableVertexAttribArray(1)
+
+
+program.uniform('light.direction', new V3(1, 1, 1))
+program.uniform('light.ambient', new V3(.2, .2, .2))
+program.uniform('light.diffuse', new V3(1, 1, 1))
+program.uniform('light.specular', new V3(.5, .5, .5))
+program.uniform('shininess', new UniformFloat(.5))
+program.uniform('viewPos', new V3(0, 0, -10))
 
 let rotation = Quaternion.fromAngle(new V3(1, 1, 0), 1)
 const loop = () => {
@@ -59,8 +69,10 @@ const loop = () => {
   const view = lookAt(new V3(0, 0, -10), new V3(0, 0, 0), new V3(0, 1, 0))
   program.uniform('view', view)
 
-  const model = rotation.toMatrix()
+  const model = rotation.matrix
   program.uniform('model', model)
+
+  program.uniform('color', new V3(1, 0, 0))
 
 
   gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_BYTE, 0)

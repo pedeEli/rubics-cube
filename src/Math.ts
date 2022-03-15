@@ -21,6 +21,7 @@ abstract class Vector<V> {
     public abstract scale(a: number): V
     public abstract add(v: V): V
     public abstract sub(v: V): V
+    public abstract mult(v: V): V
     public abstract dot(v: V): number
     public abstract toArray(): number[]
 
@@ -49,6 +50,9 @@ class V3 extends Vector<V3> implements Uniform {
     }
     public sub({x, y, z}: V3) {
         return new V3(this.x - x, this.y - y, this.z - z)
+    }
+    public mult({x, y, z}: V3) {
+        return new V3(this.x * x, this.y * y, this.z * z)
     }
     public cross({x, y, z}: V3) {
         return new V3(this.y * z - this.z * y, this.z * x - this.x * z, this.x * y - this.y * x)
@@ -101,6 +105,9 @@ class V4 extends Vector<V4> implements Uniform {
     }
     public sub({x, y, z, w}: V4) {
         return new V4(this.x - x, this.y - y, this.z - z, this.w - w)
+    }
+    public mult({x, y, z, w}: V4) {
+        return new V4(this.x * x, this.y * y, this.z * z, this.w * w)
     }
     public dot({x, y, z, w}: V4) {
         return this.x * x + this.y * y + this.z * z + this.w * w
@@ -257,6 +264,20 @@ class Transform {
 
     public static get identity() {
         return new Transform(V3.zero, Quaternion.identity, V3.one)
+    }
+
+    public move(d: V3) {
+        this.position = this.position.add(move)
+        return this
+    }
+    public rotate(axis: V3, angle: number, degree = true) {
+        this.rotation = this.rotation.mult(Quaternion.fromAngle(axis, angle, degree))
+    }
+    public scaleBy(d: V3 | number) {
+        if (d instanceof V3) {
+            this.scale = this.scale.mult(d)
+        }
+        this.scale = this.scale.scale(d)
     }
 }
 

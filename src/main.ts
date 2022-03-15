@@ -73,7 +73,7 @@ const loop = () => {
 
   rubics.render(program, gl)
 
-  rubicsTransform.rotation = rubicsTransform.rotation.mult(Quaternion.fromAngle(new V3(1, 1, 0), 1))
+  rubicsTransform.rotate(new V3(1, 1, 0), 1)
   requestAnimationFrame(loop)
 }
 requestAnimationFrame(loop)

@@ -1,8 +1,9 @@
 import './style.css'
 
 import {Program, UniformFloat} from './Program'
-import {lookAt, perspective, Quaternion, V3} from './Math'
+import {lookAt, M44, perspective, Quaternion, Transform, V3, V4} from './Math'
 import {vertex, fragment} from './shader/cube.glsl'
+import {Rubics} from './Rubics'
 
 const canvas = document.querySelector('[data-canvas]') as HTMLCanvasElement
 const gl = canvas.getContext('webgl2')!
@@ -46,14 +47,15 @@ gl.vertexAttribPointer(1, 3, gl.FLOAT, false, 24, 12)
 gl.enableVertexAttribArray(1)
 
 
-program.uniform('light.direction', new V3(1, 1, 1))
+program.uniform('light.direction', new V3(0.2, -1, 0.3))
 program.uniform('light.ambient', new V3(.2, .2, .2))
-program.uniform('light.diffuse', new V3(1, 1, 1))
-program.uniform('light.specular', new V3(.5, .5, .5))
-program.uniform('shininess', new UniformFloat(.5))
+program.uniform('light.diffuse', new V3(.5, .5, .5))
+program.uniform('light.specular', new V3(1, 1, 1))
+program.uniform('shininess', new UniformFloat(32))
 program.uniform('viewPos', new V3(0, 0, -10))
 
-let rotation = Quaternion.fromAngle(new V3(1, 1, 0), 1)
+const rubicsTransform = new Transform(V3.zero, Quaternion.fromAngle(V3.up, 0), V3.one)
+const rubics = new Rubics(rubicsTransform)
 const loop = () => {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
   const width = window.innerWidth
@@ -69,15 +71,9 @@ const loop = () => {
   const view = lookAt(new V3(0, 0, -10), new V3(0, 0, 0), new V3(0, 1, 0))
   program.uniform('view', view)
 
-  const model = rotation.matrix
-  program.uniform('model', model)
+  rubics.render(program, gl)
 
-  program.uniform('color', new V3(1, 0, 0))
-
-
-  gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_BYTE, 0)
-
-  rotation = rotation.mult(Quaternion.fromAngle(new V3(1, 1, 0), .02))
+  rubicsTransform.rotation = rubicsTransform.rotation.mult(Quaternion.fromAngle(new V3(1, 1, 0), 1))
   requestAnimationFrame(loop)
 }
 requestAnimationFrame(loop)

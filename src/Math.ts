@@ -62,6 +62,32 @@ class V3 extends Vector<V3> implements Uniform {
     public setUniform(gl: WebGL2RenderingContext, location: WebGLUniformLocation): void {
         gl.uniform3f(location, this.x, this.y, this.z)
     }
+
+    public static get zero() {
+        return new V3(0, 0, 0)
+    }
+    public static get one() {
+        return new V3(1, 1, 1)
+    }
+    public static get up() {
+        return new V3(0, 1, 0)
+    }
+    public static get down() {
+        return new V3(0, -1, 0)
+    }
+    public static get left() {
+        return new V3(1, 0, 0)
+    }
+    public static get right() {
+        return new V3(-1, 0, 0)
+    }
+    public static get forward() {
+        return new V3(0, 0, 1)
+    }
+    public static get back() {
+        return new V3(0, 0, -1)
+    }
+
 }
 class V4 extends Vector<V4> implements Uniform {
     public constructor(public x: number, public y: number, public z: number, public w: number) {
@@ -93,6 +119,7 @@ abstract class Matrix<M> {
     public abstract sub(m: M): M
     public abstract mult(m: M): M
     public abstract toArray(): number[]
+    public static abstract get identity(): M
 }
 
 class M44 extends Matrix<M44> implements Uniform {
@@ -118,6 +145,14 @@ class M44 extends Matrix<M44> implements Uniform {
     }
     public toArray() {
         return [...this.r1.toArray(), ...this.r2.toArray(), ...this.r3.toArray(), ...this.r4.toArray()]
+    }
+    public static get identity() {
+        return new M44(
+            new V4(1, 0, 0, 0),
+            new V4(0, 1, 0, 0),
+            new V4(0, 0, 1, 0),
+            new V4(0, 0, 0, 1)
+        )
     }
 
 
@@ -160,7 +195,9 @@ const lookAt = (eye: V3, center: V3, up: V3) => {
 class Quaternion {
     public constructor(public real: number, public im: V3) {}
 
-    public static fromAngle(axis: V3, angle: number) {
+    public static fromAngle(axis: V3, angle: number, degree = true) {
+        if (degree)
+            angle *= Math.PI / 180
         const half = angle / 2;
         const real = Math.cos(half)
         const im = axis.normalized.scale(Math.sin(half))
@@ -210,7 +247,7 @@ class Transform {
             new V4(s.x, 0, 0, 0),
             new V4(0, s.y, 0, 0),
             new V4(0, 0, s.z, 0),
-            new V4(0, 0, 0,   1)
+            new V4(0, 0,   0, 1)
         ))
     }
 }
@@ -221,5 +258,6 @@ export {
     V3,
     lookAt,
     Quaternion,
-    M44
+    M44,
+    Transform
 }

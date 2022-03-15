@@ -1,6 +1,6 @@
 class Program {
-    private program: WebGLProgram | null = null
-    private uniformMap: Map<string, number>
+    private program: WebGLProgram
+    private uniformMap: Map<string, WebGLUniformLocation>
 
     public constructor(
         private path: string,
@@ -11,11 +11,12 @@ class Program {
         const vertexShader = this.createShader(vertexShaderSource, this.gl.VERTEX_SHADER, 'vertex')
         const fragmentShader = this.createShader(fragmentShaderSource, this.gl.FRAGMENT_SHADER, 'fragment')
 
-        this.program = this.gl.createProgram()
+        const p = this.gl.createProgram()
         
-        if (!this.program)
+        if (!p)
             throw new Error('Fatal: webgl could not create program object!')
 
+        this.program = p
         this.gl.attachShader(this.program, vertexShader)
         this.gl.attachShader(this.program, fragmentShader)
         this.gl.linkProgram(this.program)
@@ -23,15 +24,15 @@ class Program {
         if (!success) {            
             const info = this.gl.getProgramInfoLog(this.program)
             this.gl.deleteProgram(this.program)
-            this.program = null
             throw new Error(`Link Program: ${info}`)
         }
 
         const numUniforms = this.gl.getProgramParameter(this.program, this.gl.ACTIVE_UNIFORMS) as number
         const uniformIndices = [...Array(numUniforms).keys()]
         const uniformNames = uniformIndices.map(index => {
-            const info = this.gl.getActiveUniform(this.program!, index)
-            return [info!.name, index] as const
+            const info = this.gl.getActiveUniform(this.program, index)
+            const location = this.gl.getUniformLocation(this.program, info!.name)!
+            return [info!.name, location] as const
         })
         this.uniformMap = new Map(uniformNames)
     }
@@ -56,6 +57,14 @@ class Program {
         if (!this.program)
             throw new Error('Fatal: program does not exists!')
         this.gl.useProgram(this.program)
+    }
+
+    public uniformMatrix(name: string, m: number[]) {
+        if (!this.uniformMap.has(name))
+            throw new Error(`Fatal: unkown name: ${name}`)
+        const location = this.uniformMap.get(name)!
+        const data = new Float32Array(m)
+        this.gl.uniformMatrix4fv(location, true, data)
     }
 }
 

@@ -59,15 +59,19 @@ class Program {
         this.gl.useProgram(this.program)
     }
 
-    public uniformMatrix(name: string, m: number[]) {
+    public uniform(name: string, u: Uniform) {
         if (!this.uniformMap.has(name))
             throw new Error(`Fatal: unkown name: ${name}`)
         const location = this.uniformMap.get(name)!
-        const data = new Float32Array(m)
-        this.gl.uniformMatrix4fv(location, true, data)
+        u.setUniform(this.gl, location)
     }
 }
 
+interface Uniform {
+    setUniform(gl: WebGL2RenderingContext, program: WebGLUniformLocation): void
+}
+
 export {
-    Program
+    Program,
+    Uniform
 }

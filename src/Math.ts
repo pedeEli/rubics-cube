@@ -228,6 +228,10 @@ class Quaternion {
     public rotate(v: V3) {
         return new Quaternion(this.real, this.im.negate).mult(new Quaternion(0, v)).mult(this).im
     }
+
+    public static get identity() {
+        return new Quaternion(1, V3.zero)
+    }
 }
 
 class Transform {

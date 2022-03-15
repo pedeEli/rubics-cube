@@ -11,7 +11,7 @@ class Rubics {
             for (let y = 0; y < 3; y++) {
                 const row: Cube[] = []
                 for (let z = 0; z < 3; z++) {
-                    const transform = new Transform(new V3(x - 1, y - 1, z - 1).scale(1.2), Quaternion.fromAngle(V3.up, 0), V3.one.scale(.5))
+                    const transform = new Transform(new V3(x - 1, y - 1, z - 1).scale(1.2), Quaternion.identity, V3.one.scale(.5))
                     const cube = new Cube(transform)
                     row.push(cube)
                 }

@@ -1,7 +1,7 @@
 import './style.css'
 
 import {Program, UniformFloat} from './Program'
-import {lookAt, M44, perspective, Quaternion, Transform, V3, V4} from './Math'
+import {lookAt, perspective, Quaternion, Transform, V3} from './Math'
 import {vertex, fragment} from './shader/cube.glsl'
 import {Rubics} from './Rubics'
 
@@ -54,7 +54,7 @@ program.uniform('light.specular', new V3(1, 1, 1))
 program.uniform('shininess', new UniformFloat(32))
 program.uniform('viewPos', new V3(0, 0, -10))
 
-const rubicsTransform = new Transform(V3.zero, Quaternion.fromAngle(V3.up, 0), V3.one)
+const rubicsTransform = new Transform(V3.zero, Quaternion.identity, V3.one)
 const rubics = new Rubics(rubicsTransform)
 const loop = () => {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)

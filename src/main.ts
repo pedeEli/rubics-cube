@@ -54,7 +54,7 @@ program.uniform('light.specular', new V3(1, 1, 1))
 program.uniform('shininess', new UniformFloat(32))
 program.uniform('viewPos', new V3(0, 0, -10))
 
-const rubicsTransform = new Transform(V3.zero, Quaternion.identity, V3.one)
+const rubicsTransform = Transform.identity
 const rubics = new Rubics(rubicsTransform)
 const loop = () => {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)

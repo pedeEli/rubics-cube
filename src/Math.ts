@@ -254,6 +254,10 @@ class Transform {
             new V4(0, 0,   0, 1)
         ))
     }
+
+    public static get identity() {
+        return new Transform(V3.zero, Quaternion.identity, V3.one)
+    }
 }
 
 export {

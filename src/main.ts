@@ -55,10 +55,6 @@ program.uniform('shininess', new UniformFloat(32))
 program.uniform('viewPos', new V3(0, 0, -10))
 
 const rubics = new Rubics(Quaternion.identity)
-const cube = rubics.cubes[0][0][0]
-cube.rotation = cube.rotation.mult(Quaternion.fromAngle(V3.up, 30))
-
-
 const loop = () => {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
   const width = window.innerWidth
@@ -76,7 +72,7 @@ const loop = () => {
 
   rubics.render(program, gl)
 
-  rubics.rotation = rubics.rotation.mult(Quaternion.fromAngle(new V3(1, 1, 0), 1))
+  // rubics.rotation = rubics.rotation.mult(Quaternion.fromAngle(new V3(1, 1, 0), 1))
   requestAnimationFrame(loop)
 }
 requestAnimationFrame(loop)

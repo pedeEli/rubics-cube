@@ -3,16 +3,16 @@ import {makeTransform, Quaternion, V3} from './Math'
 import {Program} from './Program'
 
 class Rubics {
-    public cubes: Cube[][][] = []
+    private cubes: Cube[][][] = []
 
-    public constructor(public rotation: Quaternion) {
+    public constructor(private rotation: Quaternion) {
         for (let x = 0; x < 3; x++) {
             const plane: Cube[][] = []
             for (let y = 0; y < 3; y++) {
                 const row: Cube[] = []
                 for (let z = 0; z < 3; z++) {
-                    const position = new V3(x - 1, y - 1, z - 1).scale(1.02)
-                    const cube = new Cube(position, Quaternion.identity)
+                    const position = new V3(x - 1, y - 1, z - 1).scale(1.2)
+                    const cube = new Cube(position, Quaternion.identity, x, y, z)
                     row.push(cube)
                 }
                 plane.push(row)

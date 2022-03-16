@@ -52,13 +52,6 @@ const cameraLookAt = V3.zero
 const cameraFront = cameraLookAt.sub(cameraPos).normalized
 const cameraRight = cameraUp.cross(cameraFront).normalized
 
-program.uniform('light.direction', new V3(0.2, -1, 0.3))
-program.uniform('light.ambient', new V3(.2, .2, .2))
-program.uniform('light.diffuse', new V3(.5, .5, .5))
-program.uniform('light.specular', new V3(1, 1, 1))
-program.uniform('shininess', new UniformFloat(32))
-program.uniform('viewPos', cameraPos)
-
 const rubics = new Rubics(Quaternion.identity)
 
 let mousedown = false

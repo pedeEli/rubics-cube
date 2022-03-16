@@ -126,6 +126,7 @@ abstract class Matrix<M> {
     public abstract sub(m: M): M
     public abstract mult(m: M): M
     public abstract toArray(): number[]
+    public abstract get inverse(): M
     public static abstract get identity(): M
 }
 
@@ -180,8 +181,55 @@ class M44 extends Matrix<M44> implements Uniform {
         const data = new Float32Array(this.toArray())
         gl.uniformMatrix4fv(location, true, data)
     }
-}
 
+    public get inverse() {
+        const [i00, i01, i02, i03] = this.c1.toArray()
+        const [i10, i11, i12, i13] = this.c2.toArray()
+        const [i20, i21, i22, i23] = this.c3.toArray()
+        const [i30, i31, i32, i33] = this.c4.toArray()
+
+        const s0 = i00 * i11 - i10 * i01
+        const s1 = i00 * i12 - i10 * i02
+        const s2 = i00 * i13 - i10 * i03
+        const s3 = i01 * i12 - i11 * i02
+        const s4 = i01 * i13 - i11 * i03
+        const s5 = i02 * i13 - i12 * i03
+        const c5 = i22 * i33 - i32 * i23
+        const c4 = i21 * i33 - i31 * i23
+        const c3 = i21 * i32 - i31 * i22
+        const c2 = i20 * i33 - i30 * i23
+        const c1 = i20 * i32 - i30 * i22
+        const c0 = i20 * i31 - i30 * i21
+        const det = s0 * c5 - s1 * c4 + s2 * c3 + s3 * c2 - s4 * c1 + s5 * c0
+        const invDet = 1 / det
+        return new M44(
+            new V4(
+                (i11 * c5 - i12 * c4 + i13 * c3)
+                (-i01 * c5 + i02 * c4 - i03 * c3)
+                (i31 * s5 - i32 * s4 + i33 * s3)
+                (-i21 * s5 + i22 * s4 - i23 * s3)
+            ),
+            new V4(
+                (-i10 * c5 + i12 * c2 - i13 * c1)
+                (i00 * c5 - i02 * c2 + i03 * c1)
+                (-i30 * s5 + i32 * s2 - i33 * s1)
+                (i20 * s5 - i22 * s2 + i23 * s1)
+            ),
+            new V4(
+                (i10 * c4 - i11 * c2 + i13 * c0)
+                (-i00 * c4 + i01 * c2 - i03 * c0)
+                (i30 * s4 - i31 * s2 + i33 * s0)
+                (-i20 * s4 + i21 * s2 - i23 * s0)
+            ),
+            new V4(
+                (-i10 * c3 + i11 * c1 - i12 * c0)
+                (i00 * c3 - i01 * c1 + i02 * c0)
+                (-i30 * s3 + i31 * s1 - i32 * s0)
+                (i20 * s3 - i21 * s1 + i22 * s0)
+            )
+        ).scale(invDet)
+    }
+}
 
 
 const lookAt = (eye: V3, center: V3, up: V3) => {

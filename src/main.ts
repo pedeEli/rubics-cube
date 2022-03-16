@@ -1,7 +1,7 @@
 import './style.css'
 
 import {Program, UniformFloat} from './Program'
-import {lookAt, perspective, Quaternion, Transform, V3} from './Math'
+import {lookAt, perspective, Quaternion, V3} from './Math'
 import {vertex, fragment} from './shader/cube.glsl'
 import {Rubics} from './Rubics'
 
@@ -16,10 +16,10 @@ program.use()
 
 
 const vertices = [
-    1,  1,  0,    0, 0, 1,
-    1, -1,  0,    0, 0, 1,
-   -1,  1,  0,    0, 0, 1,
-   -1, -1,  0,    0, 0, 1
+    .5,  .5,  0,    0, 0, 1,
+    .5, -.5,  0,    0, 0, 1,
+   -.5,  .5,  0,    0, 0, 1,
+   -.5, -.5,  0,    0, 0, 1
 ]
 const verticesBuffer = new Float32Array(vertices)
 const vbo = gl.createBuffer()!
@@ -54,8 +54,11 @@ program.uniform('light.specular', new V3(1, 1, 1))
 program.uniform('shininess', new UniformFloat(32))
 program.uniform('viewPos', new V3(0, 0, -10))
 
-const rubicsTransform = Transform.identity
-const rubics = new Rubics(rubicsTransform)
+const rubics = new Rubics(Quaternion.identity)
+const cube = rubics.cubes[0][0][0]
+cube.rotation = cube.rotation.mult(Quaternion.fromAngle(V3.up, 30))
+
+
 const loop = () => {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
   const width = window.innerWidth
@@ -73,7 +76,7 @@ const loop = () => {
 
   rubics.render(program, gl)
 
-  rubicsTransform.rotate(new V3(1, 1, 0), 1)
+  rubics.rotation = rubics.rotation.mult(Quaternion.fromAngle(new V3(1, 1, 0), 1))
   requestAnimationFrame(loop)
 }
 requestAnimationFrame(loop)

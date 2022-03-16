@@ -1,18 +1,18 @@
 import {Cube} from './Cube'
-import {Quaternion, Transform, V3} from './Math'
+import {makeTransform, Quaternion, V3} from './Math'
 import {Program} from './Program'
 
 class Rubics {
-    private cubes: Cube[][][] = []
+    public cubes: Cube[][][] = []
 
-    public constructor(public transform: Transform) {
+    public constructor(public rotation: Quaternion) {
         for (let x = 0; x < 3; x++) {
             const plane: Cube[][] = []
             for (let y = 0; y < 3; y++) {
                 const row: Cube[] = []
                 for (let z = 0; z < 3; z++) {
-                    const transform = new Transform(new V3(x - 1, y - 1, z - 1).scale(1.2), Quaternion.identity, V3.one.scale(.5))
-                    const cube = new Cube(transform)
+                    const position = new V3(x - 1, y - 1, z - 1).scale(1.02)
+                    const cube = new Cube(position, Quaternion.identity)
                     row.push(cube)
                 }
                 plane.push(row)
@@ -22,8 +22,11 @@ class Rubics {
     }
 
     public render(program: Program, gl: WebGL2RenderingContext) {
-        const m = this.transform.matrix
-        this.cubes.forEach(plane => plane.forEach(row => row.forEach(cube => cube.render(m, program, gl))))
+        const transformMatrix = makeTransform(V3.zero, this.rotation)
+        this.cubes.forEach(
+            plane => plane.forEach(
+                row => row.forEach(
+                    cube => cube.render(transformMatrix, program, gl))))
     }
 }
 

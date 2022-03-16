@@ -241,44 +241,12 @@ class Quaternion {
     }
 }
 
-class Transform {
-    public constructor(public position: V3, public rotation: Quaternion, public scale: V3) {}
-
-    public get matrix() {
-        const p = this.position
-        const s = this.scale
-        return new M44(
-            new V4(1, 0, 0, p.x),
-            new V4(0, 1, 0, p.y),
-            new V4(0, 0, 1, p.z),
-            new V4(0, 0, 0, 1)
-        )
-        .mult(this.rotation.matrix)
-        .mult(new M44(
-            new V4(s.x, 0, 0, 0),
-            new V4(0, s.y, 0, 0),
-            new V4(0, 0, s.z, 0),
-            new V4(0, 0,   0, 1)
-        ))
-    }
-
-    public static get identity() {
-        return new Transform(V3.zero, Quaternion.identity, V3.one)
-    }
-
-    public move(d: V3) {
-        this.position = this.position.add(move)
-        return this
-    }
-    public rotate(axis: V3, angle: number, degree = true) {
-        this.rotation = this.rotation.mult(Quaternion.fromAngle(axis, angle, degree))
-    }
-    public scaleBy(d: V3 | number) {
-        if (d instanceof V3) {
-            this.scale = this.scale.mult(d)
-        }
-        this.scale = this.scale.scale(d)
-    }
+const makeTransform = ({x, y, z}: V3, rotation: Quaternion) => {
+    const m = rotation.matrix
+    m.r1.w = x
+    m.r2.w = y
+    m.r3.w = z
+    return m
 }
 
 export {
@@ -288,5 +256,5 @@ export {
     lookAt,
     Quaternion,
     M44,
-    Transform
+    makeTransform
 }

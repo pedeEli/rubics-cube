@@ -11,7 +11,7 @@ class Rubics {
             for (let y = 0; y < 3; y++) {
                 const row: Cube[] = []
                 for (let z = 0; z < 3; z++) {
-                    const position = new V3(x - 1, y - 1, z - 1).scale(1.2)
+                    const position = new V3(x - 1, y - 1, z - 1).scale(1.02)
                     const cube = new Cube(position, Quaternion.identity, x, y, z)
                     row.push(cube)
                 }
@@ -27,6 +27,10 @@ class Rubics {
             plane => plane.forEach(
                 row => row.forEach(
                     cube => cube.render(transformMatrix, program, gl))))
+    }
+
+    public rotate(axis: V3, angle: number) {
+        this.rotation = this.rotation.mult(Quaternion.fromAngle(this.rotation.rotate(axis), angle))
     }
 }
 

@@ -46,15 +46,35 @@ gl.enableVertexAttribArray(0)
 gl.vertexAttribPointer(1, 3, gl.FLOAT, false, 24, 12)
 gl.enableVertexAttribArray(1)
 
+const cameraPos = new V3(0, 0, -10)
+const cameraUp = V3.up
+const cameraLookAt = V3.zero
+const cameraFront = cameraLookAt.sub(cameraPos).normalized
+const cameraRight = cameraUp.cross(cameraFront).normalized
 
 program.uniform('light.direction', new V3(0.2, -1, 0.3))
 program.uniform('light.ambient', new V3(.2, .2, .2))
 program.uniform('light.diffuse', new V3(.5, .5, .5))
 program.uniform('light.specular', new V3(1, 1, 1))
 program.uniform('shininess', new UniformFloat(32))
-program.uniform('viewPos', new V3(0, 0, -10))
+program.uniform('viewPos', cameraPos)
 
 const rubics = new Rubics(Quaternion.identity)
+
+let mousedown = false
+canvas.addEventListener('mousedown', () => mousedown = true)
+canvas.addEventListener('mouseup', () => mousedown = false)
+canvas.addEventListener('mousemove', event => {
+  if (!mousedown) return
+  const dx = event.movementX
+  const dy = event.movementY
+  if (dx === 0 && dy === 0) return
+  const n = cameraUp.scale(dy).add(cameraRight.scale(dx))
+  const axis = cameraFront.cross(n)
+  const angle = Math.sqrt(dx * dx + dy * dy) * .3
+  rubics.rotate(axis, angle)
+})
+
 const loop = () => {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
   const width = window.innerWidth
@@ -67,12 +87,11 @@ const loop = () => {
   const projection = perspective(45 * Math.PI / 180, width / height, .1, 100)
   program.uniform('projection', projection)
 
-  const view = lookAt(new V3(0, 0, -10), new V3(0, 0, 0), new V3(0, 1, 0))
+  const view = lookAt(cameraPos, cameraLookAt, cameraUp)
   program.uniform('view', view)
 
   rubics.render(program, gl)
 
-  // rubics.rotation = rubics.rotation.mult(Quaternion.fromAngle(new V3(1, 1, 0), 1))
   requestAnimationFrame(loop)
 }
 requestAnimationFrame(loop)

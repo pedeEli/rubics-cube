@@ -4,6 +4,7 @@ import {Program} from './Program'
 import {lookAt, perspective, Quaternion, V3} from './Math'
 import {vertex, fragment} from './shader/cube.glsl'
 import {Rubics} from './Rubics'
+import {Camera} from './Camera'
 
 const canvas = document.querySelector('[data-canvas]') as HTMLCanvasElement
 const gl = canvas.getContext('webgl2')!
@@ -46,11 +47,7 @@ gl.enableVertexAttribArray(0)
 gl.vertexAttribPointer(1, 3, gl.FLOAT, false, 24, 12)
 gl.enableVertexAttribArray(1)
 
-const cameraPos = new V3(0, 0, -10)
-const cameraUp = V3.up
-const cameraLookAt = V3.zero
-const cameraFront = cameraLookAt.sub(cameraPos).normalized
-const cameraRight = cameraUp.cross(cameraFront).normalized
+const camera = new Camera(new V3(0, 0, -10), V3.zero, V3.up, 45, .1, 100)
 
 const rubics = new Rubics(Quaternion.identity)
 
@@ -62,8 +59,8 @@ canvas.addEventListener('mousemove', event => {
   const dx = event.movementX
   const dy = event.movementY
   if (dx === 0 && dy === 0) return
-  const n = cameraUp.scale(dy).add(cameraRight.scale(dx))
-  const axis = cameraFront.cross(n)
+  const n = camera.up.scale(dy).add(camera.right.scale(dx))
+  const axis = camera.forward.cross(n)
   const angle = Math.sqrt(dx * dx + dy * dy) * .3
   rubics.rotate(axis, angle)
 })
@@ -77,11 +74,8 @@ const loop = () => {
   canvas.height = height
   gl.viewport(0, 0, width, height)
 
-  const projection = perspective(45 * Math.PI / 180, width / height, .1, 100)
-  program.uniform('projection', projection)
-
-  const view = lookAt(cameraPos, cameraLookAt, cameraUp)
-  program.uniform('view', view)
+  camera.setProjectionMatrix(program, width, height)
+  camera.setViewMatrix(program)
 
   rubics.render(program, gl)
 

@@ -47,7 +47,7 @@ gl.enableVertexAttribArray(0)
 gl.vertexAttribPointer(1, 3, gl.FLOAT, false, 24, 12)
 gl.enableVertexAttribArray(1)
 
-const camera = new Camera(new V3(0, 0, -10), V3.zero, V3.up, 45, .1, 100)
+const camera = new Camera(new V3(0, 0, -10), V3.zero, V3.up, 45, window.innerWidth / window.innerHeight, .1, 100)
 
 const rubics = new Rubics(Quaternion.identity)
 
@@ -65,8 +65,7 @@ canvas.addEventListener('mousemove', event => {
   rubics.rotate(axis, angle)
 })
 
-const loop = () => {
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+const resizeHandler = () => {
   const width = window.innerWidth
   const height = window.innerHeight
 
@@ -74,8 +73,16 @@ const loop = () => {
   canvas.height = height
   gl.viewport(0, 0, width, height)
 
-  camera.setProjectionMatrix(program, width, height)
-  camera.setViewMatrix(program)
+  camera.aspect = width / height
+}
+window.addEventListener('resize', resizeHandler)
+resizeHandler()
+
+const loop = () => {
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+
+  program.uniform('view', camera.worldToCameraMatrix)
+  program.uniform('projection', camera.projectionMatrix)
 
   rubics.render(program, gl)
 

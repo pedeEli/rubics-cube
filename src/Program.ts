@@ -71,16 +71,7 @@ interface Uniform {
     setUniform(gl: WebGL2RenderingContext, location: WebGLUniformLocation): void
 }
 
-
-class UniformFloat implements Uniform {
-    public constructor(public value: number) {}
-    setUniform(gl: WebGL2RenderingContext, location: WebGLUniformLocation): void {
-        gl.uniform1f(location, this.value)
-    }
-}
-
 export {
     Program,
-    Uniform,
-    UniformFloat
+    Uniform
 }

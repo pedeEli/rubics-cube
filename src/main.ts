@@ -1,6 +1,6 @@
 import './style.css'
 
-import {Program, UniformFloat} from './Program'
+import {Program} from './Program'
 import {lookAt, perspective, Quaternion, V3} from './Math'
 import {vertex, fragment} from './shader/cube.glsl'
 import {Rubics} from './Rubics'

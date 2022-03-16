@@ -204,27 +204,27 @@ class M44 extends Matrix<M44> implements Uniform {
         const invDet = 1 / det
         return new M44(
             new V4(
-                (i11 * c5 - i12 * c4 + i13 * c3)
-                (-i01 * c5 + i02 * c4 - i03 * c3)
-                (i31 * s5 - i32 * s4 + i33 * s3)
+                (i11 * c5 - i12 * c4 + i13 * c3),
+                (-i01 * c5 + i02 * c4 - i03 * c3),
+                (i31 * s5 - i32 * s4 + i33 * s3),
                 (-i21 * s5 + i22 * s4 - i23 * s3)
             ),
             new V4(
-                (-i10 * c5 + i12 * c2 - i13 * c1)
-                (i00 * c5 - i02 * c2 + i03 * c1)
-                (-i30 * s5 + i32 * s2 - i33 * s1)
+                (-i10 * c5 + i12 * c2 - i13 * c1),
+                (i00 * c5 - i02 * c2 + i03 * c1),
+                (-i30 * s5 + i32 * s2 - i33 * s1),
                 (i20 * s5 - i22 * s2 + i23 * s1)
             ),
             new V4(
-                (i10 * c4 - i11 * c2 + i13 * c0)
-                (-i00 * c4 + i01 * c2 - i03 * c0)
-                (i30 * s4 - i31 * s2 + i33 * s0)
+                (i10 * c4 - i11 * c2 + i13 * c0),
+                (-i00 * c4 + i01 * c2 - i03 * c0),
+                (i30 * s4 - i31 * s2 + i33 * s0),
                 (-i20 * s4 + i21 * s2 - i23 * s0)
             ),
             new V4(
-                (-i10 * c3 + i11 * c1 - i12 * c0)
-                (i00 * c3 - i01 * c1 + i02 * c0)
-                (-i30 * s3 + i31 * s1 - i32 * s0)
+                (-i10 * c3 + i11 * c1 - i12 * c0),
+                (i00 * c3 - i01 * c1 + i02 * c0),
+                (-i30 * s3 + i31 * s1 - i32 * s0),
                 (i20 * s3 - i21 * s1 + i22 * s0)
             )
         ).scale(invDet)

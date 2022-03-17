@@ -1,5 +1,4 @@
-import {M44} from '@Math/Matrix'
-import {V3, V4} from '@Math/Vector'
+import {V3} from '@Math/Vector'
 import {Quaternion} from '@Math/Quarternion'
 import {Program} from '../Program'
 
@@ -19,17 +18,21 @@ const planeInfo = {
 
 class Cube implements GameObject {
     private _planes: Plane[] = []
+    private _outsides: Plane[] = []
     public transform: Transform
 
     public constructor(position: V3, rotation: Quaternion, x: number, y: number, z: number, parent: GameObject) {
         this.transform = new Transform(position, rotation, positionFirst, parent)
         Object.entries(planeInfo).forEach(([dir, {color, pos, axis, angle}]) => {
-            if (isColorBlack(dir as keyof typeof planeInfo, x, y, z))
+            const inside = isInside(dir as keyof typeof planeInfo, x, y, z)
+            if (inside)
                 color = V3.zero
 
             const plane = new Plane(color, pos.scale(.5), Quaternion.fromAngle(axis, angle), this)
             this.transform.addChild(plane)
             this._planes.push(plane)
+            if (inside) return 
+            this._outsides.push(plane)
         })
     }
 
@@ -38,11 +41,11 @@ class Cube implements GameObject {
     }
 
     public get planes() {
-        return this._planes
+        return this._outsides
     }
 }
 
-const isColorBlack = (dir: keyof typeof planeInfo, x: number, y: number, z: number) => {
+const isInside = (dir: keyof typeof planeInfo, x: number, y: number, z: number) => {
     return dir === 'up'      && y !== 2
         || dir === 'down'    && y !== 0
         || dir === 'forward' && z !== 2

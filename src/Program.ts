@@ -71,7 +71,15 @@ interface Uniform {
     setUniform(gl: WebGL2RenderingContext, location: WebGLUniformLocation): void
 }
 
+class UniformInt implements Uniform {
+    public constructor(private value: number) {}
+    setUniform(gl: WebGL2RenderingContext, location: WebGLUniformLocation): void {
+        gl.uniform1i(location, this.value)
+    }
+}
+
 export {
     Program,
-    Uniform
+    Uniform,
+    UniformInt
 }

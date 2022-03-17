@@ -1,12 +1,29 @@
-import {V3, M44} from './Math'
-import {Program} from './Program'
+import {V3, M44, Quaternion, makeTransform} from './Math'
+import {Program, UniformInt} from './Program'
 
 class Plane {
-    public constructor(private color: V3, private transform: M44) {}
+    private _color: V3
+    private _transform: M44
+    private _position: V3
+    private _rotation: Quaternion
+
+    public intersects = false
+
+    public constructor(color: V3, position: V3, rotation: Quaternion) {
+        this._color = color
+        this._position = position
+        this._rotation = rotation
+        this._transform = makeTransform(position, rotation)
+    }
+
+    public get transform() {
+        return this._transform
+    }
 
     public render(parent: M44, program: Program, gl: WebGL2RenderingContext) {
-        program.uniform('model', parent.mult(this.transform))
-        program.uniform('color', this.color)
+        program.uniform('model', parent.mult(this._transform))
+        program.uniform('color', this._color)
+        program.uniform('intersects', new UniformInt(this.intersects ? 1 : 0))
         gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_BYTE, 0)
     }
 }

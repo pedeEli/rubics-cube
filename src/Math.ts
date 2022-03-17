@@ -112,6 +112,9 @@ class V4 extends Vector<V4> implements Uniform {
     public dot({x, y, z, w}: V4) {
         return this.x * x + this.y * y + this.z * z + this.w * w
     }
+    public toV3() {
+        return new V3(this.x, this.y, this.z)
+    }
     public toArray() {
         return [this.x, this.y, this.z, this.w]
     }
@@ -120,17 +123,19 @@ class V4 extends Vector<V4> implements Uniform {
     }
 }
 
-abstract class Matrix<M> {
+abstract class Matrix<M, V> {
     public abstract scale(a: number): M
     public abstract add(m: M): M
     public abstract sub(m: M): M
     public abstract mult(m: M): M
+    public abstract mult(v: V): V
     public abstract toArray(): number[]
+    public abstract get transpose(): M
     public abstract get inverse(): M
     public static abstract get identity(): M
 }
 
-class M44 extends Matrix<M44> implements Uniform {
+class M44 extends Matrix<M44, V4> implements Uniform {
     public constructor(public r1: V4, public r2: V4, public r3: V4, public r4: V4) {
         super()
     }
@@ -143,7 +148,17 @@ class M44 extends Matrix<M44> implements Uniform {
     public sub({r1, r2, r3, r4}: M44) {
         return new M44(this.r1.sub(r1), this.r2.sub(r2), this.r3.sub(r3), this.r4.sub(r4))
     }
-    public mult(m: M44) {
+    public mult(m: M44): M44
+    public mult(v: V4): V4
+    public mult(m) {
+        if (m.x !== undefined) {
+            return new V4(
+                this.r1.dot(m),
+                this.r2.dot(m),
+                this.r3.dot(m),
+                this.r4.dot(m)
+            )
+        }
         return new M44(
             new V4(this.r1.dot(m.c1), this.r1.dot(m.c2), this.r1.dot(m.c3), this.r1.dot(m.c4)),
             new V4(this.r2.dot(m.c1), this.r2.dot(m.c2), this.r2.dot(m.c3), this.r2.dot(m.c4)),
@@ -182,11 +197,15 @@ class M44 extends Matrix<M44> implements Uniform {
         gl.uniformMatrix4fv(location, true, data)
     }
 
+    public get transpose() {
+        return new M44(this.c1, this.c2, this.c3, this.c4)
+    }
+
     public get inverse() {
-        const [i00, i01, i02, i03] = this.c1.toArray()
-        const [i10, i11, i12, i13] = this.c2.toArray()
-        const [i20, i21, i22, i23] = this.c3.toArray()
-        const [i30, i31, i32, i33] = this.c4.toArray()
+        const [i00, i01, i02, i03] = this.r1.toArray()
+        const [i10, i11, i12, i13] = this.r2.toArray()
+        const [i20, i21, i22, i23] = this.r3.toArray()
+        const [i30, i31, i32, i33] = this.r4.toArray()
 
         const s0 = i00 * i11 - i10 * i01
         const s1 = i00 * i12 - i10 * i02
@@ -290,11 +309,11 @@ class Quaternion {
 }
 
 const makeTransform = ({x, y, z}: V3, rotation: Quaternion) => {
-    const m = rotation.matrix
-    m.r1.w = x
-    m.r2.w = y
-    m.r3.w = z
-    return m
+    const transform = rotation.matrix
+    transform.r1.w = x
+    transform.r2.w = y
+    transform.r3.w = z
+    return transform
 }
 
 export {

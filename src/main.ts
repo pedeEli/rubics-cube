@@ -1,10 +1,12 @@
 import './style.css'
 
 import {Program} from './Program'
-import {Quaternion, V3} from './Math'
+import {M44, Quaternion, V3, makeTransform, V4} from './Math'
 import {vertex, fragment} from './shader/cube.glsl'
 import {Rubics} from './Rubics'
 import {Camera} from './Camera'
+import {Ray} from './Ray'
+import { Plane } from './Plane'
 
 const canvas = document.querySelector('[data-canvas]') as HTMLCanvasElement
 const gl = canvas.getContext('webgl2')!
@@ -51,11 +53,8 @@ const camera = new Camera(new V3(0, 0, -10), V3.zero, V3.up, 45, window.innerWid
 
 const rubics = new Rubics(Quaternion.identity)
 
-let mousedown = false
-canvas.addEventListener('mousedown', () => mousedown = true)
-canvas.addEventListener('mouseup', () => mousedown = false)
 canvas.addEventListener('mousemove', event => {
-  if (!mousedown) return
+  if (event.buttons !== 1) return
   const dx = event.movementX
   const dy = event.movementY
   if (dx === 0 && dy === 0) return
@@ -78,6 +77,16 @@ const resizeHandler = () => {
 window.addEventListener('resize', resizeHandler)
 resizeHandler()
 
+
+canvas.addEventListener('mousemove', event => {
+  const ray = new Ray(camera, event.offsetX, event.offsetY, window.innerWidth, window.innerHeight)
+  ray.intersectRubics(rubics)
+  // const intersecting = ray.intersectPlane(plane, M44.identity)
+  // console.log('intersecting: ', intersecting)
+})
+
+// const plane = new Plane(V3.one, V3.right, Quaternion.fromAngle(V3.forward, 0))
+
 const loop = () => {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
@@ -85,6 +94,7 @@ const loop = () => {
   program.uniform('projection', camera.projectionMatrix)
 
   rubics.render(program, gl)
+  // plane.render(M44.identity, program, gl)
 
   requestAnimationFrame(loop)
 }

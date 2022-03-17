@@ -13,29 +13,44 @@ const planeInfo = {
 } as const
 
 class Cube {
-    private planes: Plane[] = []
+    private _planes: Plane[] = []
+    private _position: V3
+    private _rotation: Quaternion
+    private _transform!: M44
 
-    public constructor(private position: V3, private rotation: Quaternion, x: number, y: number, z: number) {
+    public constructor(position: V3, rotation: Quaternion, x: number, y: number, z: number) {
+        this._position = position
+        this._rotation = rotation
+        this.calcTransform()
         Object.entries(planeInfo).forEach(([dir, {color, pos, axis, angle}]) => {
             if (isColorBlack(dir as keyof typeof planeInfo, x, y, z))
                 color = V3.zero
 
-            const transformMatrix = makeTransform(pos.scale(.5), Quaternion.fromAngle(axis, angle))
-            this.planes.push(new Plane(color, transformMatrix))
+            this._planes.push(new Plane(color, pos.scale(.5), Quaternion.fromAngle(axis, angle)))
         })
     }
-
-    public render(parent: M44, program: Program, gl: WebGL2RenderingContext) {
-        const {x, y, z} = this.position
+    private calcTransform() {
+        const {x, y, z} = this._position
         const positionMatrix = new M44(
             new V4(1, 0, 0, x),
             new V4(0, 1, 0, y),
             new V4(0, 0, 1, z),
             new V4(0, 0, 0, 1)
         )
-        const rotationMatrix = this.rotation.matrix
-        const transformMatrix = parent.mult(rotationMatrix).mult(positionMatrix)
-        this.planes.forEach(plane => plane.render(transformMatrix, program, gl))
+        const rotationMatrix = this._rotation.matrix
+        this._transform = rotationMatrix.mult(positionMatrix)
+    }
+
+    public render(parent: M44, program: Program, gl: WebGL2RenderingContext) {
+        const transform = parent.mult(this._transform)
+        this._planes.forEach(plane => plane.render(transform, program, gl))
+    }
+
+    public get transform() {
+        return this._transform
+    }
+    public get planes() {
+        return this._planes
     }
 }
 

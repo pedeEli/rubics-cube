@@ -47,6 +47,13 @@ class Transform {
         this._rotation = this._rotation.mult(Quaternion.fromAngle(this._rotation.rotate(axis), angle))
         this._setTransforms()
     }
+
+    public get position() {
+        return this._position
+    }
+    public get rotation() {
+        return this._rotation
+    }
 }
 
 const rotationFirst: CalcTransform = ({x, y, z}, rotation) => {

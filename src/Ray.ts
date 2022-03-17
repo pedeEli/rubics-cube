@@ -23,7 +23,12 @@ class Ray {
     }
 
     private intersectCube(cube: Cube) {
-        return cube.planes.filter(plane => this.intersectPlane(plane))
+        return cube.planes.reduce<{plane: Plane, d: number}[]>((acc, plane) => {
+            const hit = this.intersectPlane(plane)
+            if (!hit.inside)
+                return acc
+            return [...acc, {plane: hit.plane!, d: hit.d!}]
+        }, [])
     }
     public intersectPlane(plane: Plane) {
         const transform = plane.transform.globalTransform
@@ -40,7 +45,7 @@ class Ray {
 
         const denom = this.direction.dot(normal)
         if (denom === 0)
-            return false
+            return {inside: false}
         
         const d = positionTopLeft.sub(this.origin).dot(normal) / denom
         const intersection = this.origin.add(this.direction.scale(d))
@@ -53,10 +58,15 @@ class Ray {
         const dot2 = fromTopLeft.dot(top)
         const dot3 = fromBottomRight.dot(left.negate)
         const dot4 = fromBottomRight.dot(top.negate)
-        return dot1 <= 1 && dot1 >= 0
-            && dot2 <= 1 && dot2 >= 0
-            && dot3 <= 1 && dot3 >= 0
-            && dot4 <= 1 && dot4 >= 0
+        const inside = dot1 <= 1 && dot1 >= 0
+                    && dot2 <= 1 && dot2 >= 0
+                    && dot3 <= 1 && dot3 >= 0
+                    && dot4 <= 1 && dot4 >= 0
+        return {
+            inside: inside,
+            plane,
+            d
+        }
     }
 }
 

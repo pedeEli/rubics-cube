@@ -1,4 +1,7 @@
+import {V4} from '@Math/Vector'
+
 import {Rubics} from '@GameObjects/Rubics'
+import {Plane} from '@GameObjects/Plane'
 import {Camera} from '@GameObjects/Camera'
 import {Ray} from './Ray'
 
@@ -32,7 +35,9 @@ class InputHandler {
         this.removeHovering()
         const ray = new Ray(this._camera, event.offsetX, event.offsetY, window.innerWidth, window.innerHeight)
         const planes = ray.intersectRubics(this._rubics)
-        planes.forEach(plane => plane.hovering = true)
+        if (!planes.length) return
+        planes.sort((a, b) => a.d - b.d)
+        planes[0].plane.hovering = true
     }
     private removeHovering() {
         this._rubics.cubes.forEach(cube => cube.planes.forEach(plane => plane.hovering = false))

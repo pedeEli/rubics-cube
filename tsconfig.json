@@ -12,7 +12,11 @@
     "noEmit": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noImplicitReturns": true
+    "noImplicitReturns": true,
+    "paths": {
+      "@Math/*": ["./src/Math/*"],
+      "@GameObjects/*": ["./src/GameObjects/*"]
+    }
   },
   "include": ["src"]
 }

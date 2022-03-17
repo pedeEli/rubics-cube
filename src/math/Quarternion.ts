@@ -1,5 +1,5 @@
-import {V3, V4} from './Vector'
-import {M44} from './Matrix'
+import {V3, V4} from '@Math/Vector'
+import {M44} from '@Math/Matrix'
 
 class Quaternion {
     public constructor(public real: number, public im: V3) {}

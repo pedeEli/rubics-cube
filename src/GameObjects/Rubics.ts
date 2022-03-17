@@ -1,9 +1,9 @@
-import {Cube} from './Cube'
-import {M44} from './math/Matrix'
-import {V3} from './math/Vector'
-import {Quaternion} from './math/Quarternion'
-import {makeTransform} from './math/util'
-import {Program} from './Program'
+import {Cube} from '@GameObjects/Cube'
+import {M44} from '@Math/Matrix'
+import {V3} from '@Math/Vector'
+import {Quaternion} from '@Math/Quarternion'
+import {makeTransform} from '@Math/Util'
+import {Program} from '../Program'
 
 class Rubics {
     private _cubes: Cube[][][] = []

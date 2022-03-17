@@ -1,11 +1,11 @@
 import './style.css'
 
 import {Program} from './Program'
-import {Quaternion} from './math/Quarternion'
-import {V3} from './math/Vector'
-import {vertex, fragment} from './shader/cube.glsl'
-import {Rubics} from './Rubics'
-import {Camera} from './Camera'
+import {Quaternion} from '@Math/Quarternion'
+import {V3} from '@Math/Vector'
+import {vertex, fragment} from './Shader/cube.glsl'
+import {Rubics} from '@GameObjects/Rubics'
+import {Camera} from '@GameObjects/Camera'
 import {Ray} from './Ray'
 
 const canvas = document.querySelector('[data-canvas]') as HTMLCanvasElement

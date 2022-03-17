@@ -1,8 +1,8 @@
-import {M44} from './math/Matrix'
-import {V3, V4} from './math/Vector'
-import {Quaternion} from './math/Quarternion'
-import {Program} from './Program'
-import {Plane} from './Plane'
+import {M44} from '@Math/Matrix'
+import {V3, V4} from '@Math/Vector'
+import {Quaternion} from '@Math/Quarternion'
+import {Program} from '../Program'
+import {Plane} from '@GameObjects/Plane'
 
 
 const planeInfo = {

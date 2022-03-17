@@ -1,4 +1,4 @@
-import {V4} from './Vector'
+import {V4} from '@Math/Vector'
 import {Uniform} from '../Program'
 
 abstract class Matrix<M, V> {

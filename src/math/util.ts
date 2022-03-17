@@ -1,6 +1,6 @@
-import {V3, V4} from './Vector'
-import {M44} from './Matrix'
-import {Quaternion} from './Quarternion'
+import {V3, V4} from '@Math/Vector'
+import {M44} from '@Math/Matrix'
+import {Quaternion} from '@Math/Quarternion'
 
 const perspective = (fovy: number, aspect: number, near: number, far: number) => {
     const tanHalfFovy = Math.tan(fovy / 2)

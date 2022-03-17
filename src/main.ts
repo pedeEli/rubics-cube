@@ -6,7 +6,7 @@ import {V3} from '@Math/Vector'
 import {vertex, fragment} from './Shader/cube.glsl'
 import {Rubics} from '@GameObjects/Rubics'
 import {Camera} from '@GameObjects/Camera'
-import {Ray} from './Ray'
+import {InputHandler} from './InputHandler'
 
 const canvas = document.querySelector('[data-canvas]') as HTMLCanvasElement
 const gl = canvas.getContext('webgl2')!
@@ -50,19 +50,9 @@ gl.vertexAttribPointer(1, 3, gl.FLOAT, false, 24, 12)
 gl.enableVertexAttribArray(1)
 
 const camera = new Camera(new V3(0, 0, -10), V3.zero, V3.up, 45, window.innerWidth / window.innerHeight, .1, 100)
-
 const rubics = new Rubics(Quaternion.identity)
-
-canvas.addEventListener('mousemove', event => {
-  if (event.buttons !== 1) return
-  const dx = event.movementX
-  const dy = event.movementY
-  if (dx === 0 && dy === 0) return
-  const n = camera.up.scale(dy).add(camera.right.scale(dx))
-  const axis = camera.forward.cross(n)
-  const angle = Math.sqrt(dx * dx + dy * dy) * .3
-  rubics.transform.rotate(axis, angle)
-})
+const inputHandler = new InputHandler(canvas, rubics, camera)
+inputHandler.setupHandlers()
 
 const resizeHandler = () => {
   const width = window.innerWidth
@@ -76,16 +66,6 @@ const resizeHandler = () => {
 }
 window.addEventListener('resize', resizeHandler)
 resizeHandler()
-
-canvas.addEventListener('mousemove', event => {
-  removeHovering()
-  const ray = new Ray(camera, event.offsetX, event.offsetY, window.innerWidth, window.innerHeight)
-  const planes = ray.intersectRubics(rubics)
-  planes.forEach(plane => plane.hovering = true)
-})
-const removeHovering = () => {
-  rubics.cubes.forEach(cube => cube.planes.forEach(plane => plane.hovering = false))
-}
 
 
 const loop = () => {

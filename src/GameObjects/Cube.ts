@@ -2,7 +2,10 @@ import {M44} from '@Math/Matrix'
 import {V3, V4} from '@Math/Vector'
 import {Quaternion} from '@Math/Quarternion'
 import {Program} from '../Program'
+
 import {Plane} from '@GameObjects/Plane'
+import {GameObject} from '@GameObjects/GameObject'
+import {Transform, positionFirst} from '@GameObjects/Transform'
 
 
 const planeInfo = {
@@ -14,43 +17,26 @@ const planeInfo = {
     right: {color: new V3(0, 0, 1), pos: V3.right, axis: V3.down, angle: 270} as const,
 } as const
 
-class Cube {
+class Cube implements GameObject {
     private _planes: Plane[] = []
-    private _position: V3
-    private _rotation: Quaternion
-    private _transform!: M44
+    public transform: Transform
 
-    public constructor(position: V3, rotation: Quaternion, x: number, y: number, z: number) {
-        this._position = position
-        this._rotation = rotation
-        this.calcTransform()
+    public constructor(position: V3, rotation: Quaternion, x: number, y: number, z: number, parent: GameObject) {
+        this.transform = new Transform(position, rotation, positionFirst, parent)
         Object.entries(planeInfo).forEach(([dir, {color, pos, axis, angle}]) => {
             if (isColorBlack(dir as keyof typeof planeInfo, x, y, z))
                 color = V3.zero
 
-            this._planes.push(new Plane(color, pos.scale(.5), Quaternion.fromAngle(axis, angle)))
+            const plane = new Plane(color, pos.scale(.5), Quaternion.fromAngle(axis, angle), this)
+            this.transform.addChild(plane)
+            this._planes.push(plane)
         })
     }
-    private calcTransform() {
-        const {x, y, z} = this._position
-        const positionMatrix = new M44(
-            new V4(1, 0, 0, x),
-            new V4(0, 1, 0, y),
-            new V4(0, 0, 1, z),
-            new V4(0, 0, 0, 1)
-        )
-        const rotationMatrix = this._rotation.matrix
-        this._transform = rotationMatrix.mult(positionMatrix)
+
+    public render(program: Program, gl: WebGL2RenderingContext) {
+        this._planes.forEach(plane => plane.render(program, gl))
     }
 
-    public render(parent: M44, program: Program, gl: WebGL2RenderingContext) {
-        const transform = parent.mult(this._transform)
-        this._planes.forEach(plane => plane.render(transform, program, gl))
-    }
-
-    public get transform() {
-        return this._transform
-    }
     public get planes() {
         return this._planes
     }

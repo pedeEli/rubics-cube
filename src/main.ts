@@ -61,7 +61,7 @@ canvas.addEventListener('mousemove', event => {
   const n = camera.up.scale(dy).add(camera.right.scale(dx))
   const axis = camera.forward.cross(n)
   const angle = Math.sqrt(dx * dx + dy * dy) * .3
-  rubics.rotate(axis, angle)
+  rubics.transform.rotate(axis, angle)
 })
 
 const resizeHandler = () => {
@@ -77,15 +77,16 @@ const resizeHandler = () => {
 window.addEventListener('resize', resizeHandler)
 resizeHandler()
 
-
 canvas.addEventListener('mousemove', event => {
+  removeHovering()
   const ray = new Ray(camera, event.offsetX, event.offsetY, window.innerWidth, window.innerHeight)
-  ray.intersectRubics(rubics)
-  // const intersecting = ray.intersectPlane(plane, M44.identity)
-  // console.log('intersecting: ', intersecting)
+  const planes = ray.intersectRubics(rubics)
+  planes.forEach(plane => plane.hovering = true)
 })
+const removeHovering = () => {
+  rubics.cubes.forEach(cube => cube.planes.forEach(plane => plane.hovering = false))
+}
 
-// const plane = new Plane(V3.one, V3.right, Quaternion.fromAngle(V3.forward, 0))
 
 const loop = () => {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
@@ -94,7 +95,6 @@ const loop = () => {
   program.uniform('projection', camera.projectionMatrix)
 
   rubics.render(program, gl)
-  // plane.render(M44.identity, program, gl)
 
   requestAnimationFrame(loop)
 }

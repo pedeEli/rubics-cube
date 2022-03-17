@@ -20,19 +20,14 @@ class Ray {
     }
 
     public intersectRubics(rubics: Rubics) {
-        rubics.cubes.forEach(cube => {
-            this.intersectCube(cube, rubics.transform)
-        })
+        return rubics.cubes.map(cube => this.intersectCube(cube)).flat(1)
     }
 
-    private intersectCube(cube: Cube, rubicsTransform: M44) {
-        const transform = rubicsTransform.mult(cube.transform)
-        cube.planes.forEach(plane => {
-            plane.intersects = this.intersectPlane(plane, transform)
-        })
+    private intersectCube(cube: Cube) {
+        return cube.planes.filter(plane => this.intersectPlane(plane))
     }
-    public intersectPlane(plane: Plane, cubeTransform: M44) {
-        const transform = cubeTransform.mult(plane.transform)
+    public intersectPlane(plane: Plane) {
+        const transform = plane.transform.globalTransform
         const positionTopLeft = transform.mult(new V4(.5, .5, 0, 1)).toV3()
         const positionBottomRight = transform.mult(new V4(-.5, -.5, 0, 1)).toV3()
 

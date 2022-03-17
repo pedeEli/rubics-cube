@@ -35,16 +35,7 @@ const lookAt = (eye: V3, center: V3, up: V3) => {
     )
 }
 
-const makeTransform = ({x, y, z}: V3, rotation: Quaternion) => {
-    const transform = rotation.matrix
-    transform.r1.w = x
-    transform.r2.w = y
-    transform.r3.w = z
-    return transform
-}
-
 export {
     perspective,
-    lookAt,
-    makeTransform
+    lookAt
 }

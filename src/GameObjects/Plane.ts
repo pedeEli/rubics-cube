@@ -1,32 +1,25 @@
-import {M44} from '@Math/Matrix'
 import {V3} from '@Math/Vector'
 import {Quaternion} from '@Math/Quarternion'
-import {makeTransform} from '@Math/Util'
 import {Program, UniformInt} from '../Program'
 
-class Plane {
+import {GameObject} from '@GameObjects/GameObject'
+import {Transform, rotationFirst} from '@GameObjects/Transform'
+
+class Plane implements GameObject {
     private _color: V3
-    private _transform: M44
-    private _position: V3
-    private _rotation: Quaternion
+    public transform: Transform
 
-    public intersects = false
+    public hovering = false
 
-    public constructor(color: V3, position: V3, rotation: Quaternion) {
+    public constructor(color: V3, position: V3, rotation: Quaternion, parent: GameObject) {
         this._color = color
-        this._position = position
-        this._rotation = rotation
-        this._transform = makeTransform(position, rotation)
+        this.transform = new Transform(position, rotation, rotationFirst, parent)
     }
 
-    public get transform() {
-        return this._transform
-    }
-
-    public render(parent: M44, program: Program, gl: WebGL2RenderingContext) {
-        program.uniform('model', parent.mult(this._transform))
+    public render(program: Program, gl: WebGL2RenderingContext) {
+        program.uniform('model', this.transform.globalTransform)
         program.uniform('color', this._color)
-        program.uniform('intersects', new UniformInt(this.intersects ? 1 : 0))
+        program.uniform('intersects', new UniformInt(this.hovering ? 1 : 0))
         gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_BYTE, 0)
     }
 }

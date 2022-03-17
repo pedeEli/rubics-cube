@@ -19,10 +19,10 @@ program.use()
 
 
 const vertices = [
-    .5,  .5,  0,    0, 0, 1,
-    .5, -.5,  0,    0, 0, 1,
-   -.5,  .5,  0,    0, 0, 1,
-   -.5, -.5,  0,    0, 0, 1
+    .5,  .5,  0,
+    .5, -.5,  0,
+   -.5,  .5,  0,
+   -.5, -.5,  0
 ]
 const verticesBuffer = new Float32Array(vertices)
 const vbo = gl.createBuffer()!
@@ -44,10 +44,8 @@ gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indicesBuffer, gl.STATIC_DRAW)
 gl.bindBuffer(gl.ARRAY_BUFFER, vbo)
 gl.bufferData(gl.ARRAY_BUFFER, verticesBuffer, gl.STATIC_DRAW)
 
-gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 24, 0)
+gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 12, 0)
 gl.enableVertexAttribArray(0)
-gl.vertexAttribPointer(1, 3, gl.FLOAT, false, 24, 12)
-gl.enableVertexAttribArray(1)
 
 const camera = new Camera(new V3(0, 0, -10), V3.zero, V3.up, 45, window.innerWidth / window.innerHeight, .1, 100)
 const rubics = new Rubics(Quaternion.identity)

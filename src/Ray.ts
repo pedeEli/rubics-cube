@@ -1,5 +1,6 @@
 import {Camera} from './Camera'
-import {V3, V4, M44} from './Math'
+import {V3, V4} from './math/Vector'
+import {M44} from './math/Matrix'
 import {Rubics} from './Rubics'
 import {Cube} from './Cube'
 import {Plane} from './Plane'

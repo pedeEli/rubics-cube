@@ -1,5 +1,8 @@
 import {Cube} from './Cube'
-import {makeTransform, Quaternion, V3, M44} from './Math'
+import {M44} from './math/Matrix'
+import {V3} from './math/Vector'
+import {Quaternion} from './math/Quarternion'
+import {makeTransform} from './math/util'
 import {Program} from './Program'
 
 class Rubics {

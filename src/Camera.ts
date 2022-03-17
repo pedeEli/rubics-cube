@@ -1,4 +1,6 @@
-import {V3, M44, perspective, lookAt} from './Math'
+import {V3} from './math/Vector'
+import {M44} from './math/Matrix'
+import {lookAt, perspective} from './math/util'
 
 class Camera {
     private _position!: V3

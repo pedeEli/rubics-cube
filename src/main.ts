@@ -1,12 +1,12 @@
 import './style.css'
 
 import {Program} from './Program'
-import {M44, Quaternion, V3, makeTransform, V4} from './Math'
+import {Quaternion} from './math/Quarternion'
+import {V3} from './math/Vector'
 import {vertex, fragment} from './shader/cube.glsl'
 import {Rubics} from './Rubics'
 import {Camera} from './Camera'
 import {Ray} from './Ray'
-import { Plane } from './Plane'
 
 const canvas = document.querySelector('[data-canvas]') as HTMLCanvasElement
 const gl = canvas.getContext('webgl2')!

@@ -1,4 +1,6 @@
-import {V3, M44, Quaternion, makeTransform, V4} from './Math'
+import {M44} from './math/Matrix'
+import {V3, V4} from './math/Vector'
+import {Quaternion} from './math/Quarternion'
 import {Program} from './Program'
 import {Plane} from './Plane'
 

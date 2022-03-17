@@ -1,4 +1,7 @@
-import {V3, M44, Quaternion, makeTransform} from './Math'
+import {M44} from './math/Matrix'
+import {V3} from './math/Vector'
+import {Quaternion} from './math/Quarternion'
+import {makeTransform} from './math/util'
 import {Program, UniformInt} from './Program'
 
 class Plane {

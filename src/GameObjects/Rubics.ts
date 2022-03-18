@@ -18,7 +18,7 @@ class Rubics implements GameObject {
             for (let y = 0; y < 3; y++) {
                 const row: Cube[] = []
                 for (let z = 0; z < 3; z++) {
-                    const position = new V3(x - 1, y - 1, z - 1).scale(1.02)
+                    const position = new V3(x, y, z).sub(V3.one)
                     const cube = new Cube(position, Quaternion.identity, x, y, z, this)
                     this.transform.addChild(cube)
                     row.push(cube)

@@ -1,7 +1,6 @@
 import {Rubics} from '@GameObjects/Rubics'
 import {Camera} from '@GameObjects/Camera'
 import {Ray} from './Ray'
-import {V3} from '@Math/Vector'
 
 class InputHandler {
     private _canvas: HTMLCanvasElement

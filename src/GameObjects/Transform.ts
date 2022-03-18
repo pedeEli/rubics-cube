@@ -65,6 +65,10 @@ class Transform {
     public get parent() {
         return this._parent
     }
+
+    public forEachChildren(f: (child: GameObject) => void) {
+        this._children.forEach(f)
+    }
 }
 
 const rotationFirst: CalcTransform = ({x, y, z}, rotation) => {

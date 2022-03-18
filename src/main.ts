@@ -65,14 +65,19 @@ const resizeHandler = () => {
 window.addEventListener('resize', resizeHandler)
 resizeHandler()
 
-
+let lastTime = Date.now()
 const loop = () => {
+  const currentTime = Date.now()
+  const deltaTime = (currentTime - lastTime) / 1000
+  lastTime = currentTime
+
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
   program.uniform('view', camera.worldToCameraMatrix)
   program.uniform('projection', camera.projectionMatrix)
 
   rubics.render(program, gl)
+  rubics.update(deltaTime)
 
   requestAnimationFrame(loop)
 }

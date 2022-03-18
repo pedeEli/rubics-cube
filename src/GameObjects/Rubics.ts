@@ -32,10 +32,10 @@ class Rubics implements GameObject {
     }
 
     public render(program: Program, gl: WebGL2RenderingContext) {
-        this._cubes.forEach(
-            plane => plane.forEach(
-                row => row.forEach(
-                    cube => cube.render(program, gl))))
+        this.transform.forEachChildren(child => child.render?.call(child, program, gl))
+    }
+    public update(delta: number) {
+        this.transform.forEachChildren(child => child.update?.call(child, delta))
     }
 
     public get cubes() {
@@ -83,7 +83,7 @@ class Rubics implements GameObject {
 
     private turnPlane(plane: Cube[][], axis: V3, angle: number, offset: number, setter: (x1: number, x2: number, cube: Cube) => void) {
         plane.flat(1).forEach(cube => {
-            cube.transform.rotate(axis, angle)
+            cube.rotate(axis, angle)
         })
 
         const cubes = [

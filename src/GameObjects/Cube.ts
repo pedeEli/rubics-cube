@@ -39,11 +39,36 @@ class Cube implements GameObject {
     }
 
     public render(program: Program, gl: WebGL2RenderingContext) {
-        this._planes.forEach(plane => plane.render(program, gl))
+        this.transform.forEachChildren(child => child.render?.call(child, program, gl))
     }
 
     public get planes() {
         return this._outsides
+    }
+
+    private _turning = false
+    private _turnSpeed = .5
+    private _turnProgress = 0
+    private _axis: V3 = V3.zero
+    private _targetAngle = 0
+    private _initialRotation: Quaternion = Quaternion.identity
+
+    public rotate(axis: V3, angle: number) {
+        this._turning = true
+        this._turnProgress = 0
+        this._initialRotation = this.transform.rotation
+        this._axis = this._initialRotation.rotate(axis)
+        this._targetAngle = angle
+    }
+    public update(delta: number) {
+        if (!this._turning) return
+        this._turnProgress += delta
+        if (this._turnProgress >= this._turnSpeed) {
+            this._turning = false
+            this.transform.rotation = this._initialRotation.mult(Quaternion.fromAngle(this._axis, this._targetAngle))
+            return
+        }
+        this.transform.rotation = this._initialRotation.mult(Quaternion.fromAngle(this._axis, this._targetAngle * this._turnProgress / this._turnSpeed))
     }
 }
 

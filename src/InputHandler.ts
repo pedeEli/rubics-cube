@@ -7,6 +7,8 @@ class InputHandler {
     private _rubics: Rubics
     private _camera: Camera
 
+    private _rotating = false
+
     public constructor(canvas: HTMLCanvasElement, rubics: Rubics, camera: Camera) {
         this._canvas = canvas
         this._rubics = rubics
@@ -35,7 +37,9 @@ class InputHandler {
     }
 
     private rotateHandler(event: MouseEvent) {
-        if (event.buttons !== 1) return
+        this._rotating = event.buttons === 4
+        if (!this._rotating) return
+        this.removeHovering()
         const dx = event.movementX
         const dy = event.movementY
         if (dx === 0 && dy === 0) return
@@ -45,6 +49,7 @@ class InputHandler {
         this._rubics.transform.rotate(axis, angle)
     }
     private rayHandler(event: MouseEvent) {
+        if (this._rotating) return
         this.removeHovering()
         const ray = new Ray(this._camera, event.offsetX, event.offsetY, window.innerWidth, window.innerHeight)
         const planes = ray.intersectRubics(this._rubics)

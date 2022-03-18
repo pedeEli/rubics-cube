@@ -1,6 +1,7 @@
 import {Rubics} from '@GameObjects/Rubics'
 import {Camera} from '@GameObjects/Camera'
 import {Ray} from './Ray'
+import {V3} from '@Math/Vector'
 
 class InputHandler {
     private _canvas: HTMLCanvasElement
@@ -16,6 +17,22 @@ class InputHandler {
     public setupHandlers() {
         this._canvas.addEventListener('mousemove', e => this.rayHandler(e))
         this._canvas.addEventListener('mousemove', e => this.rotateHandler(e))
+        document.addEventListener('keypress', e => this.keyHandler(e))
+    }
+
+    private keyHandler(event: KeyboardEvent) {
+        if (event.key === 'w')
+            this._rubics.turn('white')
+        if (event.key === 'y')
+            this._rubics.turn('yellow')
+        if (event.key === 'b')
+            this._rubics.turn('blue')
+        if (event.key === 'g')
+            this._rubics.turn('green')
+        if (event.key === 'r')
+            this._rubics.turn('red')
+        if (event.key === 'o')
+            this._rubics.turn('orange')
     }
 
     private rotateHandler(event: MouseEvent) {

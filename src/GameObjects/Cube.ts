@@ -20,9 +20,11 @@ class Cube implements GameObject {
     private _planes: Plane[] = []
     private _outsides: Plane[] = []
     public transform: Transform
+    public index: V3
 
     public constructor(position: V3, rotation: Quaternion, x: number, y: number, z: number, parent: GameObject) {
         this.transform = new Transform(position, rotation, positionFirst, parent)
+        this.index = new V3(x, y, z)
         Object.entries(planeInfo).forEach(([dir, {color, hovering, pos, axis, angle}]) => {
             const inside = isInside(dir as keyof typeof planeInfo, x, y, z)
             if (inside)

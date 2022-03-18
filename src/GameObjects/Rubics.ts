@@ -59,17 +59,26 @@ class Rubics implements GameObject {
 
     private turnX(index: number) {
         const plane = this._cubes[index]
-        this.turnPlane(plane, V3.right, 90, 2, (y, z, cube) => this._cubes[index][y][z] = cube)
+        this.turnPlane(plane, V3.right, 90, 2, (y, z, cube) => {
+            cube.index = new V3(index, y, z)
+            this._cubes[index][y][z] = cube
+        })
     }
 
     private turnY(index: number) {
         const plane = this._cubes.map(p => p[index])
-        this.turnPlane(plane, V3.up, 90, 2, (x, z, cube) => this._cubes[x][index][z] = cube)
+        this.turnPlane(plane, V3.up, 90, 2, (x, z, cube) => {
+            cube.index = new V3(x, index, z)
+            this._cubes[x][index][z] = cube
+        })
     }
 
     private turnZ(index: number) {
         const plane = this._cubes.map(p => p.map(r => r[index]))
-        this.turnPlane(plane, V3.forward, 90, 6, (x, y, cube) => this._cubes[x][y][index] = cube)
+        this.turnPlane(plane, V3.forward, 90, 6, (x, y, cube) => {
+            cube.index = new V3(x, y, index)
+            this._cubes[x][y][index] = cube
+        })
     }
 
     private turnPlane(plane: Cube[][], axis: V3, angle: number, offset: number, setter: (x1: number, x2: number, cube: Cube) => void) {

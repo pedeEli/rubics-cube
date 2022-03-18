@@ -44,7 +44,15 @@ class Transform {
 
 
     public rotate(axis: V3, angle: number) {
-        this._rotation = this._rotation.mult(Quaternion.fromAngle(this._rotation.rotate(axis), angle))
+        this.rotation = this._rotation.mult(Quaternion.fromAngle(this._rotation.rotate(axis), angle))
+    }
+
+    public set position(value: V3) {
+        this._position = value
+        this._setTransforms()
+    }
+    public set rotation(value: Quaternion) {
+        this._rotation = value
         this._setTransforms()
     }
 
@@ -53,6 +61,9 @@ class Transform {
     }
     public get rotation() {
         return this._rotation
+    }
+    public get parent() {
+        return this._parent
     }
 }
 

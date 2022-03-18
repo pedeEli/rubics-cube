@@ -1,5 +1,8 @@
 import {Rubics} from '@GameObjects/Rubics'
 import {Camera} from '@GameObjects/Camera'
+import {Plane} from '@GameObjects/Plane'
+import {Cube} from '@GameObjects/Cube'
+
 import {Ray} from './Ray'
 
 class InputHandler {
@@ -8,6 +11,7 @@ class InputHandler {
     private _camera: Camera
 
     private _rotating = false
+    private _hovering?: Plane
 
     public constructor(canvas: HTMLCanvasElement, rubics: Rubics, camera: Camera) {
         this._canvas = canvas
@@ -18,7 +22,33 @@ class InputHandler {
     public setupHandlers() {
         this._canvas.addEventListener('mousemove', e => this.rayHandler(e))
         this._canvas.addEventListener('mousemove', e => this.rotateHandler(e))
+        this._canvas.addEventListener('click', e => this.clickHandler(e))
         document.addEventListener('keypress', e => this.keyHandler(e))
+    }
+
+    private clickHandler(event: MouseEvent) {
+        if (event.button !== 0) return
+        if (!this._hovering) return
+        
+        const cube = this._hovering.transform.parent as Cube
+        const {x, y, z} = cube.index
+        const isCenter = x === 1 && y === 1
+                      || x === 1 && z === 1
+                      || y === 1 && z === 1
+        if (!isCenter) return
+
+        if (x === 0)
+            return this._rubics.turn('blue')
+        if (x === 2)
+            return this._rubics.turn('green')
+        if (y === 0)
+            return this._rubics.turn('yellow')
+        if (y === 2)
+            return this._rubics.turn('white')
+        if (z === 0)
+            return this._rubics.turn('red')
+        if (z === 2)
+            return this._rubics.turn('orange')
     }
 
     private keyHandler(event: KeyboardEvent) {
@@ -53,9 +83,13 @@ class InputHandler {
         this.removeHovering()
         const ray = new Ray(this._camera, event.offsetX, event.offsetY, window.innerWidth, window.innerHeight)
         const planes = ray.intersectRubics(this._rubics)
-        if (!planes.length) return
+        if (!planes.length) {
+            this._hovering = undefined
+            return
+        }
         planes.sort((a, b) => a.d - b.d)
         planes[0].plane.hovering = true
+        this._hovering = planes[0].plane
     }
     private removeHovering() {
         this._rubics.cubes.forEach(cube => cube.planes.forEach(plane => plane.hovering = false))

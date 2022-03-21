@@ -2,10 +2,9 @@ import {V3} from '@Math/Vector'
 import {Quaternion} from '@Math/Quarternion'
 import {Program} from '../Program'
 
-import {Plane} from '@GameObjects/Plane'
+import {Plane, createTransform} from '@GameObjects/Plane'
 import {GameObject} from '@GameObjects/GameObject'
 import {Transform, positionFirst} from '@GameObjects/Transform'
-
 
 const planeInfo = {
     up: {color: new V3(1, 1, 1), hovering: new V3(.7, .7, .7), pos: V3.up, axis: V3.left, angle: 90} as const,
@@ -17,7 +16,6 @@ const planeInfo = {
 } as const
 
 class Cube implements GameObject {
-    private _planes: Plane[] = []
     private _outsides: Plane[] = []
     public transform: Transform
     public index: V3
@@ -30,9 +28,9 @@ class Cube implements GameObject {
             if (inside)
                 color = V3.zero
 
-            const plane = new Plane(color, hovering, pos.scale(.5), Quaternion.fromAngle(axis, angle), this)
+            const transform = createTransform(pos.scale(.5), Quaternion.fromAngle(axis, angle), this, inside)
+            const plane = new Plane(color, hovering, transform)
             this.transform.addChild(plane)
-            this._planes.push(plane)
             if (inside) return 
             this._outsides.push(plane)
         })

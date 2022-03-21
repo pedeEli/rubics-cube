@@ -24,7 +24,7 @@ class Transform {
         this._setTransforms()
     }
 
-    private _setTransforms() {
+    protected _setTransforms() {
         const localTransform = this._calcTransform(this._position, this._rotation)
         this.localTransform = localTransform
 
@@ -92,6 +92,7 @@ const positionFirst: CalcTransform = ({x, y, z}, rotation) => {
 
 export {
     Transform,
+    CalcTransform,
     rotationFirst,
     positionFirst
 }

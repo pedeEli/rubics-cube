@@ -1,21 +1,20 @@
 import {V3} from '@Math/Vector'
-import {Quaternion} from '@Math/Quarternion'
 import {Program} from '../Program'
 
 import {GameObject} from '@GameObjects/GameObject'
 import {Transform, rotationFirst} from '@GameObjects/Transform'
+import {Quaternion} from '@Math/Quarternion'
+import {PlaneTransform} from '@GameObjects/PlaneTransform'
 
 class Plane implements GameObject {
     private _color: V3
     private _hoveringColor: V3
-    public transform: Transform
 
     public hovering = false
 
-    public constructor(color: V3, hoveringColor: V3, position: V3, rotation: Quaternion, parent: GameObject) {
+    public constructor(color: V3, hoveringColor: V3, public transform: Transform) {
         this._color = color
         this._hoveringColor = hoveringColor
-        this.transform = new Transform(position, rotation, rotationFirst, parent)
     }
 
     public render(program: Program, gl: WebGL2RenderingContext) {
@@ -25,6 +24,13 @@ class Plane implements GameObject {
     }
 }
 
+const createTransform = (position: V3, rotation: Quaternion, parent: GameObject, isInside: boolean) => {
+    if (isInside)
+        return new Transform(position, rotation, rotationFirst, parent)
+    return new PlaneTransform(position, rotation, rotationFirst, parent)
+}
+
 export {
-    Plane
+    Plane,
+    createTransform
 }

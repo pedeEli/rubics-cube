@@ -33,16 +33,16 @@ class Ray {
     }
 
     public intersectPlane(plane: Plane) {
-        const {normal, top, left, positionTopLeft, positionBottomRight} = plane.transform as PlaneTransform
+        const {normal, top, left, topLeft, bottomRight} = plane.transform as PlaneTransform
 
         const denom = this.direction.dot(normal)
         if (denom === 0)
             return {inside: false}
         
-        const d = positionTopLeft.sub(this.origin).dot(normal) / denom
+        const d = topLeft.sub(this.origin).dot(normal) / denom
         const intersection = this.origin.add(this.direction.scale(d))
-        const fromTopLeft = intersection.sub(positionTopLeft).normalized
-        const fromBottomRight = intersection.sub(positionBottomRight).normalized
+        const fromTopLeft = intersection.sub(topLeft).normalized
+        const fromBottomRight = intersection.sub(bottomRight).normalized
 
         const dot1 = fromTopLeft.dot(left)
         const dot2 = fromTopLeft.dot(top)

@@ -5,14 +5,13 @@ import {GameObject} from '@GameObjects/GameObject'
 import {Transform, rotationFirst} from '@GameObjects/Transform'
 import {Quaternion} from '@Math/Quarternion'
 import {PlaneTransform} from '@GameObjects/PlaneTransform'
-
 class Plane implements GameObject {
     private _color: V3
     private _hoveringColor: V3
 
     public hovering = false
 
-    public constructor(color: V3, hoveringColor: V3, public transform: Transform) {
+    public constructor(color: V3, hoveringColor: V3, public transform: Transform, public turnDirections?: TurnDirections) {
         this._color = color
         this._hoveringColor = hoveringColor
     }

@@ -1,12 +1,12 @@
 import {Cube} from '@GameObjects/Cube'
 import {V3} from '@Math/Vector'
 import {Quaternion} from '@Math/Quarternion'
+import {getRotationAxis} from '@Math/Util'
 import {Program} from '../Program'
 
 import {GameObject} from '@GameObjects/GameObject'
 import {Transform, rotationFirst} from '@GameObjects/Transform'
 
-type Side = 'white' | 'yellow' | 'green' | 'blue' | 'red' | 'orange'
 
 class Rubics implements GameObject {
     private _cubes: Cube[][][] = []
@@ -42,22 +42,16 @@ class Rubics implements GameObject {
         return this._cubes.flat(2)
     }
 
-    public turn(side: Side) {
-        if (side === 'blue')
-            this.turnX(0)
-        if (side === 'green')
-            this.turnX(2)
-        if (side === 'yellow')
-            this.turnY(0)
-        if (side === 'white')
-            this.turnY(2)
-        if (side === 'red')
-            this.turnZ(0)
-        if (side === 'orange')
-            this.turnZ(2)
+
+    public getPlane(axis: Axis, index: number) {
+        if (axis === 'x')
+            return this._cubes[index].flat()
+        if (axis === 'y')
+            return this._cubes.map(p => p[index]).flat()
+        return this._cubes.map(p => p.map(r => r[index])).flat()
     }
 
-    private turnX(index: number) {
+    public turnx(index: number) {
         const plane = this._cubes[index]
         this.turnPlane(plane, V3.right, 90, 2, (y, z, cube) => {
             cube.index = new V3(index, y, z)
@@ -65,7 +59,7 @@ class Rubics implements GameObject {
         })
     }
 
-    private turnY(index: number) {
+    public turny(index: number) {
         const plane = this._cubes.map(p => p[index])
         this.turnPlane(plane, V3.up, 90, 2, (x, z, cube) => {
             cube.index = new V3(x, index, z)
@@ -73,7 +67,7 @@ class Rubics implements GameObject {
         })
     }
 
-    private turnZ(index: number) {
+    public turnz(index: number) {
         const plane = this._cubes.map(p => p.map(r => r[index]))
         this.turnPlane(plane, V3.forward, 90, 6, (x, y, cube) => {
             cube.index = new V3(x, y, index)

@@ -19,6 +19,33 @@ abstract class Vector<V> {
         return this.scale(-1)
     }
 }
+class V2 extends Vector<V2> implements Uniform {
+    public constructor(public x: number, public y: number) {
+        super()
+    }
+    public scale(a) {
+        return new V2(a * this.x, a * this.y)
+    }
+    public add({x, y}) {
+        return new V2(this.x + x, this.y + y)
+    }
+    public sub({x, y}) {
+        return new V2(this.x - x, this.y - y)
+    }
+    public mult({x, y}) {
+        return new V2(this.x * x, this.y * y)
+    }
+    public dot({x, y}) {
+        return this.x * x + this.y * y
+    }
+    public toArray() {
+        return [this.x, this.y]
+    }
+
+    public setUniform(gl, location) {
+        gl.uniform2f(location, this.x, this.y)
+    }
+}
 class V3 extends Vector<V3> implements Uniform {
     public constructor(public x: number, public y: number, public z: number) {
         super()
@@ -47,6 +74,9 @@ class V3 extends Vector<V3> implements Uniform {
     public setUniform(gl, location) {
         gl.uniform3f(location, this.x, this.y, this.z)
     }
+    public toV2() {
+        return new V2(this.x, this.y)
+    }
 
     public static get zero() {
         return new V3(0, 0, 0)
@@ -72,7 +102,6 @@ class V3 extends Vector<V3> implements Uniform {
     public static get back() {
         return new V3(0, 0, -1)
     }
-
 }
 class V4 extends Vector<V4> implements Uniform {
     public constructor(public x: number, public y: number, public z: number, public w: number) {
@@ -106,6 +135,7 @@ class V4 extends Vector<V4> implements Uniform {
 
 
 export {
+    V2,
     V3,
     V4
 }

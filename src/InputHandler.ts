@@ -1,9 +1,14 @@
 import {Rubics} from '@GameObjects/Rubics'
 import {Camera} from '@GameObjects/Camera'
 import {Plane} from '@GameObjects/Plane'
+import {PlaneTransform} from '@GameObjects/PlaneTransform'
 import {Cube} from '@GameObjects/Cube'
 
+import {V2, V3} from '@Math/Vector'
+import {getRotationAxis} from '@Math/Util'
+
 import {Ray} from './Ray'
+import {debug} from './Debugger'
 
 class InputHandler {
     private _canvas: HTMLCanvasElement
@@ -22,48 +27,102 @@ class InputHandler {
     public setupHandlers() {
         this._canvas.addEventListener('mousemove', e => this.rayHandler(e))
         this._canvas.addEventListener('mousemove', e => this.rotateHandler(e))
-        this._canvas.addEventListener('click', e => this.clickHandler(e))
-        document.addEventListener('keypress', e => this.keyHandler(e))
+        this._canvas.addEventListener('mousemove', e => this.dragHandler(e))
+        this._canvas.addEventListener('mousedown', e => this.clickHandler(e))
+        this._canvas.addEventListener('mouseup', () => {
+            this._dragging = false
+            this._cubes?.forEach(cube => cube.resetRotation())
+        })
     }
+
+    
+    private _dragging = false
+    private _topLeft!: V2
+    private _right!: V2
+    private _down!: V2
+    private _mouse!: V2
+    
+    private _rightAxis!: Axis
+    private _rightIndex!: number
+    private _rightAngle!: number
+    private _downAxis!: Axis
+    private _downIndex!: number
+    private _downAngle!: number
+    private _cubes!: Cube[]
 
     private clickHandler(event: MouseEvent) {
         if (event.button !== 0) return
         if (!this._hovering) return
-        
-        const cube = this._hovering.transform.parent as Cube
-        const {x, y, z} = cube.index
-        const isCenter = x === 1 && y === 1
-                      || x === 1 && z === 1
-                      || y === 1 && z === 1
-        if (!isCenter) return
 
-        if (x === 0)
-            return this._rubics.turn('blue')
-        if (x === 2)
-            return this._rubics.turn('green')
-        if (y === 0)
-            return this._rubics.turn('yellow')
-        if (y === 2)
-            return this._rubics.turn('white')
-        if (z === 0)
-            return this._rubics.turn('red')
-        if (z === 2)
-            return this._rubics.turn('orange')
+        this._dragging = true
+        this._mouse = new V2(event.offsetX, this._canvas.height - event.offsetY)
+        const {left, top, topLeft} = this._hovering!.transform as PlaneTransform
+
+        const screenTopLeft = this._camera.worldToScreen(topLeft)
+        const screenBottomLeft = this._camera.worldToScreen(topLeft.add(left))
+        const screenTopRight = this._camera.worldToScreen(topLeft.add(top))
+        this._right = screenTopRight.sub(screenTopLeft).normalized
+        this._down = screenBottomLeft.sub(screenTopLeft).normalized
+        this._topLeft = screenTopLeft
+
+        this._setTurnDirections()
+        // this._rightAxis = 'y'
+        // this._rightIndex = turnDirections.y!
+        // this._rightAngle = 0
+        // this._downAxis = 'x'
+        // this._downIndex = turnDirections.x!
+        // this._downAngle = 0
+
+        this._cubes = this._rubics.getPlane(this._rightAxis, this._rightIndex)
+        this._cubes.forEach(cube => cube.backupRotation())
+    }
+    private _setTurnDirections() {
+        const {right, down} = this._hovering!.turnDirections!
+        const [rightAxis, rightIndex] = right
+        const [downAxis, downIndex] = down
+        this._rightAxis = rightAxis
+        this._rightIndex = rightIndex
+        this._downAxis = downAxis
+        this._downIndex = downIndex
+    }
+    private dragHandler(event: MouseEvent) {
+        if (!this._dragging) return
+        const mouse = new V2(event.offsetX, this._canvas.height - event.offsetY)
+        const deltaMouse = mouse.sub(this._mouse).normalized
+
+        this._drawDebug(mouse)
+
+        const length = this._right.dot(this._mouse.sub(mouse))
+        const rotationAxis = getRotationAxis(this._rightAxis)
+        this._cubes.forEach(cube => {
+            cube.resetRotation()
+            cube.transform.rotate(rotationAxis, length / 3.4)
+        })
+
+        // if (Math.abs(this._right.dot(deltaMouse)) > Math.abs(this._down.dot(deltaMouse))) {
+        //     this.dragRightHandler(mouse)
+        //     return
+        // }
+        // this.dragDownHandler(mouse)
+    }
+    private _drawDebug(mouse: V2) {
+        debug.clear()
+        debug.stroke('white')
+        debug.vector(this._topLeft, this._right, 50)
+        debug.vector(this._topLeft, this._down, 50)
+        // debug.stroke('violet')
+        // debug.line(this._topLeft, mouse)
+        debug.stroke('limegreen')
+        debug.line(this._mouse, mouse)
     }
 
-    private keyHandler(event: KeyboardEvent) {
-        if (event.key === 'w')
-            this._rubics.turn('white')
-        if (event.key === 'y')
-            this._rubics.turn('yellow')
-        if (event.key === 'b')
-            this._rubics.turn('blue')
-        if (event.key === 'g')
-            this._rubics.turn('green')
-        if (event.key === 'r')
-            this._rubics.turn('red')
-        if (event.key === 'o')
-            this._rubics.turn('orange')
+    private dragRightHandler(mouse: V2) {
+        const length = this._right.dot(this._mouse.sub(mouse))
+        // console.log(length)
+    }
+    private dragDownHandler(mouse: V2) {
+        const length = this._down.dot(this._mouse.sub(mouse))
+        // console.log(length)
     }
 
     private rotateHandler(event: MouseEvent) {

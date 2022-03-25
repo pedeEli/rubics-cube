@@ -35,7 +35,16 @@ const lookAt = (eye: V3, center: V3, up: V3) => {
     )
 }
 
+const getRotationAxis = (axis: Axis) => {
+    if (axis === 'x')
+        return V3.right
+    if (axis === 'y')
+        return V3.up
+    return V3.forward
+}
+
 export {
     perspective,
-    lookAt
+    lookAt,
+    getRotationAxis
 }

@@ -42,6 +42,10 @@ class Transform {
         this._children.push(child)
     }
 
+    public apply({x, y, z}: V3) {
+        return this.globalTransform.mult(new V4(x, y, z, 1)).toV3()
+    }
+
 
     public rotate(axis: V3, angle: number) {
         this.rotation = this._rotation.mult(Quaternion.fromAngle(this._rotation.rotate(axis), angle))

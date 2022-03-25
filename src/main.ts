@@ -7,6 +7,7 @@ import {vertex, fragment} from './Shader/cube.glsl'
 import {Rubics} from '@GameObjects/Rubics'
 import {Camera} from '@GameObjects/Camera'
 import {InputHandler} from './InputHandler'
+import {debug} from './Debugger'
 
 const canvas = document.querySelector('[data-canvas]') as HTMLCanvasElement
 const gl = canvas.getContext('webgl2')!
@@ -47,7 +48,7 @@ gl.bufferData(gl.ARRAY_BUFFER, verticesBuffer, gl.STATIC_DRAW)
 gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 12, 0)
 gl.enableVertexAttribArray(0)
 
-const camera = new Camera(new V3(0, 0, -10), V3.zero, V3.up, 45, window.innerWidth / window.innerHeight, .1, 100)
+const camera = new Camera(new V3(0, 0, -10), V3.zero, V3.up, 45, window.innerWidth, window.innerHeight, .1, 100)
 const rubics = new Rubics(Quaternion.identity)
 const inputHandler = new InputHandler(canvas, rubics, camera)
 inputHandler.setupHandlers()
@@ -56,11 +57,13 @@ const resizeHandler = () => {
   const width = window.innerWidth
   const height = window.innerHeight
 
+  debug.setSize(width, height)
+
   canvas.width = width
   canvas.height = height
   gl.viewport(0, 0, width, height)
 
-  camera.aspect = width / height
+  camera.screenSize(width, height)
 }
 window.addEventListener('resize', resizeHandler)
 resizeHandler()

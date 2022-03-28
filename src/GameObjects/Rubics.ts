@@ -1,7 +1,6 @@
 import {Cube} from '@GameObjects/Cube'
 import {V3} from '@Math/Vector'
 import {Quaternion} from '@Math/Quarternion'
-import {getRotationAxis} from '@Math/Util'
 import {Program} from '../Program'
 
 import {GameObject} from '@GameObjects/GameObject'

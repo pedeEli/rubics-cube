@@ -4,12 +4,18 @@ import {Plane} from '@GameObjects/Plane'
 import {PlaneTransform} from '@GameObjects/PlaneTransform'
 import {Cube} from '@GameObjects/Cube'
 
-import {V2, V3} from '@Math/Vector'
+import {V2} from '@Math/Vector'
 import {getRotationAxis} from '@Math/Util'
 
 import {Ray} from './Ray'
 import {debug} from './Debugger'
 
+interface SideInfo {
+    axis: Axis,
+    index: number,
+    angle: number,
+    cubes: Cube[]
+}
 class InputHandler {
     private _canvas: HTMLCanvasElement
     private _rubics: Rubics
@@ -31,7 +37,8 @@ class InputHandler {
         this._canvas.addEventListener('mousedown', e => this.clickHandler(e))
         this._canvas.addEventListener('mouseup', () => {
             this._dragging = false
-            this._cubes?.forEach(cube => cube.resetRotation())
+            this._rightSide?.cubes.forEach(cube => cube.resetRotation())
+            this._downSide?.cubes.forEach(cube => cube.resetRotation())
         })
     }
 
@@ -42,13 +49,9 @@ class InputHandler {
     private _down!: V2
     private _mouse!: V2
     
-    private _rightAxis!: Axis
-    private _rightIndex!: number
-    private _rightAngle!: number
-    private _downAxis!: Axis
-    private _downIndex!: number
-    private _downAngle!: number
-    private _cubes!: Cube[]
+    private _rightSide!: SideInfo
+    private _downSide!: SideInfo
+    private _side?: 'right' | 'down'
 
     private clickHandler(event: MouseEvent) {
         if (event.button !== 0) return
@@ -66,44 +69,44 @@ class InputHandler {
         this._topLeft = screenTopLeft
 
         this._setTurnDirections()
-        // this._rightAxis = 'y'
-        // this._rightIndex = turnDirections.y!
-        // this._rightAngle = 0
-        // this._downAxis = 'x'
-        // this._downIndex = turnDirections.x!
-        // this._downAngle = 0
 
-        this._cubes = this._rubics.getPlane(this._rightAxis, this._rightIndex)
-        this._cubes.forEach(cube => cube.backupRotation())
+        this._rightSide.cubes.forEach(cube => cube.backupRotation())
+        this._downSide.cubes.forEach(cube => cube.backupRotation())
+        this._side = undefined
     }
     private _setTurnDirections() {
         const {right, down} = this._hovering!.turnDirections!
         const [rightAxis, rightIndex] = right
         const [downAxis, downIndex] = down
-        this._rightAxis = rightAxis
-        this._rightIndex = rightIndex
-        this._downAxis = downAxis
-        this._downIndex = downIndex
+        this._rightSide = {
+            axis: rightAxis,
+            index: rightIndex,
+            angle: 0,
+            cubes: this._rubics.getPlane(rightAxis, rightIndex)
+        }
+        this._downSide = {
+            axis: downAxis,
+            index: downIndex,
+            angle: 0,
+            cubes: this._rubics.getPlane(downAxis, downIndex)
+        }
     }
     private dragHandler(event: MouseEvent) {
         if (!this._dragging) return
         const mouse = new V2(event.offsetX, this._canvas.height - event.offsetY)
-        const deltaMouse = mouse.sub(this._mouse).normalized
+        if (this._side === 'right')
+            return this._dragRightHandler(mouse)
+        if (this._side === 'down')
+            return this._dragDownHandler(mouse)
 
-        this._drawDebug(mouse)
-
-        const length = this._right.dot(this._mouse.sub(mouse))
-        const rotationAxis = getRotationAxis(this._rightAxis)
-        this._cubes.forEach(cube => {
-            cube.resetRotation()
-            cube.transform.rotate(rotationAxis, length / 3.4)
-        })
-
-        // if (Math.abs(this._right.dot(deltaMouse)) > Math.abs(this._down.dot(deltaMouse))) {
-        //     this.dragRightHandler(mouse)
-        //     return
-        // }
-        // this.dragDownHandler(mouse)
+        const mouseDir = mouse.sub(this._mouse).normalized
+        if (Math.abs(this._right.dot(mouseDir)) > Math.abs(this._down.dot(mouseDir))) {
+            this._side = 'right'
+            this._dragRightHandler(mouse)
+            return
+        }
+        this._side = 'down'
+        this._dragDownHandler(mouse)
     }
     private _drawDebug(mouse: V2) {
         debug.clear()
@@ -116,13 +119,23 @@ class InputHandler {
         debug.line(this._mouse, mouse)
     }
 
-    private dragRightHandler(mouse: V2) {
+    private _dragRightHandler(mouse: V2): void {
         const length = this._right.dot(this._mouse.sub(mouse))
-        // console.log(length)
+        const rotationAxis = getRotationAxis(this._rightSide.axis)
+        this._rightSide.angle = length / 3.4
+        this._rightSide.cubes.forEach(cube => {
+            cube.resetRotation()
+            cube.transform.rotate(rotationAxis, this._rightSide.angle)
+        })
     }
-    private dragDownHandler(mouse: V2) {
+    private _dragDownHandler(mouse: V2): void {
         const length = this._down.dot(this._mouse.sub(mouse))
-        // console.log(length)
+        const rotationAxis = getRotationAxis(this._downSide.axis)
+        this._downSide.angle = length / 3.4
+        this._downSide.cubes.forEach(cube => {
+            cube.resetRotation()
+            cube.transform.rotate(rotationAxis, this._downSide.angle)
+        })
     }
 
     private rotateHandler(event: MouseEvent) {

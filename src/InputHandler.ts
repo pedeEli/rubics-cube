@@ -111,7 +111,7 @@ class InputHandler {
         const mouseDir = mouse.sub(this._mouse).normalized
         const rightDot = this._rightInfo.dir.dot(mouseDir)
         const downDot = this._downInfo.dir.dot(mouseDir)
-        if (rightDot > downDot) {
+        if (Math.abs(rightDot) > Math.abs(downDot)) {
             this._side = 'right'
             this._dragSingleSide(mouse, this._rightInfo)
             return

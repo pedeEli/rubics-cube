@@ -42,8 +42,13 @@ const getRotationAxis = (axis: Axis) => {
     return V3.forward
 }
 
+const mod = (a: number, b: number) => {
+    return  ((a % b) + b) % b
+}
+
 export {
     perspective,
     lookAt,
-    getRotationAxis
+    getRotationAxis,
+    mod
 }

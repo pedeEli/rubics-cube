@@ -8,6 +8,7 @@ import {V2} from '@Math/Vector'
 import {getRotationAxis} from '@Math/Util'
 
 import {Ray} from './Ray'
+import {debug} from './Debugger'
 
 interface SideInfo {
     dir: V2,
@@ -33,11 +34,7 @@ class InputHandler {
     public setupHandlers() {
         this._canvas.addEventListener('mousemove', e => this._mousemove(e))
         this._canvas.addEventListener('mousedown', e => this._click(e))
-        this._canvas.addEventListener('mouseup', () => {
-            this._turning = false
-            this._rightInfo?.cubes.forEach(cube => cube.resetRotation())
-            this._downInfo?.cubes.forEach(cube => cube.resetRotation())
-        })
+        this._canvas.addEventListener('mouseup', e => this._mouseup(e))
     }
 
     
@@ -48,10 +45,11 @@ class InputHandler {
     private _downInfo!: SideInfo
     private _side?: 'right' | 'down'
 
-    private _click(event: MouseEvent) {
-        if (event.button !== 0) return
+    // event handlers
+    private _click({button, offsetX, offsetY}: MouseEvent) {
+        if (button !== 0) return
         if (!this._hovering) return
-        this._setSideInfo(event.offsetX, event.offsetY)
+        this._setSideInfo(offsetX, offsetY)
     }
     private _mousemove({offsetX, offsetY, movementX, movementY, buttons}: MouseEvent) {
         this._rotating = buttons === 4
@@ -61,6 +59,10 @@ class InputHandler {
         if (this._rotating)
             return this._rotate(movementX, movementY)
         this._castRay(offsetX, offsetY)
+    }
+    private _mouseup(event: MouseEvent) {
+        if (this._turning)
+            return this._finishTurn()
     }
 
     // turning sides
@@ -103,10 +105,8 @@ class InputHandler {
     private _dragSide(offsetX: number, offsetY: number) {
         if (!this._turning) return
         const mouse = new V2(offsetX, this._canvas.height - offsetY)
-        if (this._side === 'right')
-            return this._dragSingleSide(mouse, this._rightInfo)
-        if (this._side === 'down')
-            return this._dragSingleSide(mouse, this._downInfo)
+        if (this._side)
+            return this._dragSingleSide(mouse, this[`_${this._side}Info`])
 
         const mouseDir = mouse.sub(this._mouse).normalized
         const rightDot = this._rightInfo.dir.dot(mouseDir)
@@ -127,6 +127,12 @@ class InputHandler {
             cube.resetRotation()
             cube.transform.rotate(rotationAxis, info.angle)
         })
+    }
+    private _finishTurn() {
+        this._turning = false
+        const info = this[`_${this._side!}Info`]
+        const angle = Math.round(info.angle / 90)
+        this._rubics.turn(info.axis, info.index, angle)
     }
 
 

@@ -1,6 +1,7 @@
 import {Cube} from '@GameObjects/Cube'
 import {V3} from '@Math/Vector'
 import {Quaternion} from '@Math/Quarternion'
+import {mod} from '@Math/Util'
 import {Program} from '../Program'
 
 import {GameObject} from '@GameObjects/GameObject'
@@ -50,31 +51,39 @@ class Rubics implements GameObject {
         return this._cubes.map(p => p.map(r => r[index])).flat()
     }
 
-    public turnx(index: number) {
+    public turn(axis: Axis, index: number, angle: number) {
+        if (axis === 'x')
+            return this._turnX(index, angle)
+        if (axis === 'y')
+            return this._turnY(index, angle)
+        this._turnZ(index, angle)
+    }
+
+    private _turnX(index: number, angle: number) {
         const plane = this._cubes[index]
-        this.turnPlane(plane, V3.right, 90, 2, (y, z, cube) => {
+        this._turnPlane(plane, V3.right, angle, mod(2 * angle, 8), (y, z, cube) => {
             cube.index = new V3(index, y, z)
             this._cubes[index][y][z] = cube
         })
     }
 
-    public turny(index: number) {
+    private _turnY(index: number, angle: number) {
         const plane = this._cubes.map(p => p[index])
-        this.turnPlane(plane, V3.up, 90, 2, (x, z, cube) => {
+        this._turnPlane(plane, V3.up, angle, mod(2 * angle, 8), (x, z, cube) => {
             cube.index = new V3(x, index, z)
             this._cubes[x][index][z] = cube
         })
     }
 
-    public turnz(index: number) {
+    private _turnZ(index: number, angle: number) {
         const plane = this._cubes.map(p => p.map(r => r[index]))
-        this.turnPlane(plane, V3.forward, 90, 6, (x, y, cube) => {
+        this._turnPlane(plane, V3.forward, angle, mod(-2 * angle, 8), (x, y, cube) => {
             cube.index = new V3(x, y, index)
             this._cubes[x][y][index] = cube
         })
     }
 
-    private turnPlane(plane: Cube[][], axis: V3, angle: number, offset: number, setter: (x1: number, x2: number, cube: Cube) => void) {
+    private _turnPlane(plane: Cube[][], axis: V3, angle: number, offset: number, setter: (x1: number, x2: number, cube: Cube) => void) {
         plane.flat(1).forEach(cube => {
             cube.rotate(axis, angle)
         })

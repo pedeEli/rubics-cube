@@ -41,6 +41,12 @@ class Quaternion {
     public static get identity() {
         return new Quaternion(1, V3.zero)
     }
+
+    public static lerp(q1: Quaternion, q2: Quaternion, t: number) {
+        const real = q1.real + (q2.real - q1.real) * t
+        const im = V3.lerp(q1.im, q2.im, t)
+        return new Quaternion(real, im)
+    }
 }
 
 export {

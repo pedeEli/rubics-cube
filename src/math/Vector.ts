@@ -102,6 +102,10 @@ class V3 extends Vector<V3> implements Uniform {
     public static get back() {
         return new V3(0, 0, -1)
     }
+
+    public static lerp(v1: V3, v2: V3, t: number) {
+        return v1.add(v2.sub(v1).scale(t))
+    }
 }
 class V4 extends Vector<V4> implements Uniform {
     public constructor(public x: number, public y: number, public z: number, public w: number) {

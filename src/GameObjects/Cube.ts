@@ -145,28 +145,30 @@ class Cube implements GameObject {
 
 
     private _turning = false
-    private _turnSpeed = .5
-    private _turnProgress = 0
-    private _axis: V3 = V3.zero
-    private _targetAngle = 0
-    private _initialRotation: Quaternion = Quaternion.identity
+    private _turnSpeed = 5
+    private _turnProgress!: number
+    private _axis!: V3
+    private _targetAngle!: number
+    private _initialRotation!: Quaternion
+    private _targetRotation!: Quaternion
 
     public rotate(axis: V3, angle: number) {
         this._turning = true
         this._turnProgress = 0
         this._initialRotation = this.transform.rotation
         this._axis = this._initialRotation.rotate(axis)
-        this._targetAngle = angle
+        this._targetAngle = angle * 90
+        this._targetRotation = this._rotation!.mult(Quaternion.fromAngle(this._axis, this._targetAngle))
     }
     public update(delta: number) {
         if (!this._turning) return
-        this._turnProgress += delta
-        if (this._turnProgress >= this._turnSpeed) {
+        this._turnProgress += delta * this._turnSpeed
+        if (this._turnProgress >= 1) {
             this._turning = false
-            this.transform.rotation = this._initialRotation.mult(Quaternion.fromAngle(this._axis, this._targetAngle))
+            this.transform.rotation = this._targetRotation
             return
         }
-        this.transform.rotation = this._initialRotation.mult(Quaternion.fromAngle(this._axis, this._targetAngle * this._turnProgress / this._turnSpeed))
+        this.transform.rotation = Quaternion.lerp(this._initialRotation, this._targetRotation, this._turnProgress)
     }
 }
 

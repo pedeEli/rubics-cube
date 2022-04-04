@@ -119,6 +119,8 @@ class InputHandler {
     private _dragSide(offsetX: number, offsetY: number) {
         if (!this._turning) return
         const mouse = new V2(offsetX, this._canvas.height - offsetY)
+        if (this._mouse.sub(mouse).mag < 5)
+            return
         if (this._side)
             return this._dragSingleSide(mouse, this[`_${this._side}Info`])
 

@@ -1,14 +1,14 @@
 import {Rubics} from '@GameObjects/Rubics'
 import {Camera} from '@GameObjects/Camera'
 import {Plane} from '@GameObjects/Plane'
-import {PlaneTransform} from '@GameObjects/PlaneTransform'
-import {Cube} from '@GameObjects/Cube'
+import {Cube, planeInfo} from '@GameObjects/Cube'
 
-import {V2} from '@Math/Vector'
+import {V2, V4} from '@Math/Vector'
 import {getRotationAxis} from '@Math/Util'
 
 import {Ray} from './Ray'
 import {debug} from './Debugger'
+import { rotationFirst } from '@GameObjects/Transform'
 
 interface SideInfo {
     dir: V2,
@@ -69,13 +69,27 @@ class InputHandler {
     private _setSideInfo(offsetX: number, offsetY: number) {
         this._turning = true
         this._mouse = new V2(offsetX, this._canvas.height - offsetY)
-        const {left, top, topLeft} = this._hovering!.transform as PlaneTransform
+        const side = this._hovering!.side!
+        const info = planeInfo[side]
+
+        const planeTransform = rotationFirst(info.pos.scale(.5), info.rotation)
+        const rubicsTransform = this._rubics.transform.globalTransform
+        const globalTransform = rubicsTransform.mult(planeTransform)
+        const rotationTransform = globalTransform.inverse.transpose
+
+        const left = rotationTransform.mult(new V4(0, -1, 0, 1)).toV3().normalized
+        const top = rotationTransform.mult(new V4(-1, 0, 0, 1)).toV3().normalized
+        const topLeft = globalTransform.mult(new V4(.5, .5, 0, 1)).toV3()
 
         const screenTopLeft = this._camera.worldToScreen(topLeft)
         const screenBottomLeft = this._camera.worldToScreen(topLeft.add(left))
         const screenTopRight = this._camera.worldToScreen(topLeft.add(top))
         const rightDir = screenTopRight.sub(screenTopLeft).normalized
         const downDir = screenBottomLeft.sub(screenTopLeft).normalized
+
+        // debug.clear()
+        // debug.line(screenTopLeft, screenBottomLeft)
+        // debug.line(screenTopLeft, screenTopRight)
 
         this._setTurnDirections(rightDir, downDir)
 
@@ -130,7 +144,10 @@ class InputHandler {
     }
     private _finishTurn() {
         this._turning = false
-        const info = this[`_${this._side!}Info`]
+        if (!this._side)
+            return
+
+        const info = this[`_${this._side}Info`]
         const angle = Math.round(info.angle / 90)
         this._rubics.turn(info.axis, info.index, angle)
     }

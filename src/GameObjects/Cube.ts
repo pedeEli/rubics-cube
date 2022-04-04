@@ -242,5 +242,6 @@ const isInside = (side: Side, x: number, y: number, z: number) => {
 }
 
 export {
-    Cube
+    Cube,
+    planeInfo
 }

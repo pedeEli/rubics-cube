@@ -7,7 +7,6 @@ import {V2, V4} from '@Math/Vector'
 import {getRotationAxis} from '@Math/Util'
 
 import {Ray} from './Ray'
-import {debug} from './Debugger'
 import { rotationFirst } from '@GameObjects/Transform'
 
 interface SideInfo {
@@ -86,10 +85,6 @@ class InputHandler {
         const screenTopRight = this._camera.worldToScreen(topLeft.add(top))
         const rightDir = screenTopRight.sub(screenTopLeft).normalized
         const downDir = screenBottomLeft.sub(screenTopLeft).normalized
-
-        // debug.clear()
-        // debug.line(screenTopLeft, screenBottomLeft)
-        // debug.line(screenTopLeft, screenTopRight)
 
         this._setTurnDirections(rightDir, downDir)
 

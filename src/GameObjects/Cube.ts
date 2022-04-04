@@ -1,5 +1,6 @@
 import {V3} from '@Math/Vector'
 import {Quaternion} from '@Math/Quarternion'
+import {mod} from '@Math/Util'
 import {Program} from '../Program'
 
 import {Plane, createTransform} from '@GameObjects/Plane'
@@ -100,6 +101,52 @@ const turnDirections: AllTurnDirections = [
     ]
 ]
 
+type SideTransform = {
+    x: Side[],
+    y: Side[],
+    z: Side[]
+}
+type AllSideTransforms = {
+    up: SideTransform,
+    down: SideTransform,
+    right: SideTransform,
+    left: SideTransform,
+    forward: SideTransform,
+    back: SideTransform
+}
+const sideTransforms: AllSideTransforms = {
+    up: {
+        x: ['up', 'back', 'down', 'forward'],
+        y: ['up'],
+        z: ['up', 'right', 'down', 'left']
+    },
+    down: {
+        x: ['down', 'forward', 'up', 'back'],
+        y: ['down'],
+        z: ['down', 'left', 'up', 'right']
+    },
+    right: {
+        x: ['right'],
+        y: ['right', 'forward', 'left', 'back'],
+        z: ['right', 'down', 'left', 'up']
+    },
+    left: {
+        x: ['left'],
+        y: ['left', 'back', 'right', 'forward'],
+        z: ['left', 'up', 'right', 'down']
+    },
+    forward: {
+        x: ['forward', 'up', 'back', 'down'],
+        y: ['forward', 'left', 'back', 'right'],
+        z: ['forward']
+    },
+    back: {
+        x: ['back', 'down', 'forward', 'up'],
+        y: ['back', 'right', 'forward', 'left'],
+        z: ['back']
+    }
+}
+
 
 
 class Cube implements GameObject {
@@ -116,7 +163,7 @@ class Cube implements GameObject {
                 color = V3.zero
 
             const transform = createTransform(pos.scale(.5), rotation, this, inside)
-            const plane = new Plane(color, hovering, transform, turnDirections[x][y][z][side as Side])
+            const plane = new Plane(color, hovering, transform, turnDirections[x][y][z][side as Side], side as Side)
             this.transform.addChild(plane)
             if (inside) return 
             this._outsides.push(plane)
@@ -151,6 +198,19 @@ class Cube implements GameObject {
     private _targetAngle!: number
     private _initialRotation!: Quaternion
     private _targetRotation!: Quaternion
+
+    public transformSides(axis: Axis, angle: number) {
+        this._outsides.forEach(plane => {
+            const currentSide = plane.side!
+            const sides = sideTransforms[currentSide][axis]
+            const index = mod(angle, sides.length)
+            const newSide = sides[index]
+            plane.side = newSide
+            const {x, y, z} = this.index
+            plane.turnDirections = turnDirections[x][y][z][newSide]
+            if (!plane.turnDirections) debugger
+        })
+    }
 
     public rotate(axis: V3, angle: number) {
         this._turning = true

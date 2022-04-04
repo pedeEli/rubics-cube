@@ -11,7 +11,7 @@ class Plane implements GameObject {
 
     public hovering = false
 
-    public constructor(color: V3, hoveringColor: V3, public transform: Transform, public turnDirections?: TurnDirections) {
+    public constructor(color: V3, hoveringColor: V3, public transform: Transform, public turnDirections?: TurnDirections, public side?: Side) {
         this._color = color
         this._hoveringColor = hoveringColor
     }

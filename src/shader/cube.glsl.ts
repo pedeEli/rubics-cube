@@ -35,6 +35,11 @@ float map(float value, float min1, float max1, float min2, float max2)
 
 void main()
 {
+    // if (pos.x < -0.25 && pos.y < -0.25) {
+    //     FragColor = vec4(rime, 1.0);
+    //     return;
+    // }
+
     float x = abs(pos.x);
     float y = abs(pos.y);
     if (x > outer || y > outer) {

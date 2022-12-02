@@ -7,7 +7,6 @@ import {Program} from '../Program'
 import {GameObject} from '@GameObjects/GameObject'
 import {Transform, rotationFirst} from '@GameObjects/Transform'
 
-
 class Rubics implements GameObject {
     private _cubes: Cube[][][] = []
     
@@ -52,6 +51,7 @@ class Rubics implements GameObject {
     }
 
     public turn(axis: Axis, index: number, angle: number) {
+        console.log({axis, index, angle})
         if (axis === 'x')
             return this._turnX(index, angle)
         if (axis === 'y')

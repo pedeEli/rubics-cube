@@ -34,6 +34,7 @@ class InputHandler {
         this._canvas.addEventListener('mousemove', e => this._mousemove(e))
         this._canvas.addEventListener('mousedown', e => this._click(e))
         this._canvas.addEventListener('mouseup', e => this._mouseup(e))
+        this._canvas.addEventListener('mouseleave', e => this._mouseleave(e))
     }
 
     
@@ -60,6 +61,10 @@ class InputHandler {
         this._castRay(offsetX, offsetY)
     }
     private _mouseup(event: MouseEvent) {
+        if (this._turning)
+            return this._finishTurn()
+    }
+    private _mouseleave(event: MouseEvent) {
         if (this._turning)
             return this._finishTurn()
     }

@@ -14,8 +14,8 @@
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "paths": {
-      "@Math/*": ["./src/Math/*"],
-      "@GameObjects/*": ["./src/GameObjects/*"]
+      "@Math/*": ["./src/UI/Math/*"],
+      "@GameObjects/*": ["./src/UI/GameObjects/*"]
     }
   },
   "include": ["src"]

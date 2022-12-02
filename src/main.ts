@@ -1,13 +1,13 @@
 import './style.css'
 
-import {Program} from './Program'
+import {Program} from './UI/Program'
 import {Quaternion} from '@Math/Quarternion'
 import {V3} from '@Math/Vector'
-import {vertex, fragment} from './Shader/cube.glsl'
+import {vertex, fragment} from './UI/Shader/cube.glsl'
 import {Rubics} from '@GameObjects/Rubics'
 import {Camera} from '@GameObjects/Camera'
-import {InputHandler} from './InputHandler'
-import {debug} from './Debugger'
+import {InputHandler} from './UI/InputHandler'
+import {debug} from './UI/Debugger'
 
 const canvas = document.querySelector('[data-canvas]') as HTMLCanvasElement
 const gl = canvas.getContext('webgl2')!

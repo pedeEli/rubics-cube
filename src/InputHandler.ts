@@ -49,6 +49,7 @@ class InputHandler {
     private _click({button, offsetX, offsetY}: MouseEvent) {
         if (button !== 0) return
         if (!this._hovering) return
+        if (this._rubics.isTurning) return
         this._setSideInfo(offsetX, offsetY)
     }
     private _mousemove({offsetX, offsetY, movementX, movementY, buttons}: MouseEvent) {

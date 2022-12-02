@@ -20,7 +20,16 @@ class Rubics implements GameObject {
                 const row: Cube[] = []
                 for (let z = 0; z < 3; z++) {
                     const position = new V3(x, y, z).sub(V3.one)
-                    const cube = new Cube(position, Quaternion.identity, x, y, z, this)
+                    const cube = new Cube(
+                        position,
+                        Quaternion.identity,
+                        x,
+                        y,
+                        z,
+                        this,
+                        this._startCubeTurn.bind(this),
+                        this._endCubeTurn.bind(this)
+                    )
                     this.transform.addChild(cube)
                     row.push(cube)
                 }
@@ -58,6 +67,21 @@ class Rubics implements GameObject {
             return this._turnY(index, angle)
         this._turnZ(index, angle)
     }
+
+    private _currentCubesTurning = 0
+
+    public get isTurning() {
+        return this._currentCubesTurning !== 0
+    }
+
+    private _startCubeTurn() {
+        this._currentCubesTurning++
+    }
+    
+    private _endCubeTurn() {
+        this._currentCubesTurning--
+    }
+
 
     private _turnX(index: number, angle: number) {
         const plane = this._cubes[index]

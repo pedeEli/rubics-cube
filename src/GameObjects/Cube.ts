@@ -154,7 +154,16 @@ class Cube implements GameObject {
     public transform: Transform
     public index: V3
 
-    public constructor(position: V3, rotation: Quaternion, x: number, y: number, z: number, parent: GameObject) {
+    public constructor(
+        position: V3,
+        rotation: Quaternion,
+        x: number,
+        y: number,
+        z: number,
+        parent: GameObject,
+        private _startTurn: () => void,
+        private _endTurn: () => void
+    ) {
         this.transform = new Transform(position, rotation, positionFirst, parent)
         this.index = new V3(x, y, z)
         Object.entries(planeInfo).forEach(([side, {color, hovering, pos, rotation}]) => {
@@ -214,6 +223,7 @@ class Cube implements GameObject {
 
     public rotate(axis: V3, angle: number) {
         this._turning = true
+        this._startTurn()
         this._turnProgress = 0
         this._initialRotation = this.transform.rotation
         this._axis = this._initialRotation.rotate(axis)
@@ -225,6 +235,7 @@ class Cube implements GameObject {
         this._turnProgress += delta * this._turnSpeed
         if (this._turnProgress >= 1) {
             this._turning = false
+            this._endTurn()
             this.transform.rotation = this._targetRotation
             return
         }

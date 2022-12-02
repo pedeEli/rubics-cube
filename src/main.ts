@@ -53,6 +53,8 @@ const rubics = new Rubics(Quaternion.identity)
 const inputHandler = new InputHandler(canvas, rubics, camera)
 inputHandler.setupHandlers()
 
+rubics.addTurnEventListener(console.log)
+
 const resizeHandler = () => {
   const width = window.innerWidth
   const height = window.innerHeight

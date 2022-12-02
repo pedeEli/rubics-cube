@@ -7,10 +7,18 @@ import {Program} from '../Program'
 import {GameObject} from '@GameObjects/GameObject'
 import {Transform, rotationFirst} from '@GameObjects/Transform'
 
+interface TurnEvent {
+    axis: Axis,
+    index: number,
+    angle: number
+}
+
 class Rubics implements GameObject {
     private _cubes: Cube[][][] = []
     
     public transform: Transform
+
+    private _listeners = new Set<(event: TurnEvent) => void>()
 
     public constructor(rotation: Quaternion) {
         this.transform = new Transform(V3.zero, rotation, rotationFirst)
@@ -60,7 +68,7 @@ class Rubics implements GameObject {
     }
 
     public turn(axis: Axis, index: number, angle: number) {
-        console.log({axis, index, angle})
+        this._dispatchTurnEvent(axis, index, angle)
         if (axis === 'x')
             return this._turnX(index, angle)
         if (axis === 'y')
@@ -134,6 +142,20 @@ class Rubics implements GameObject {
             cube.transformSides(axisName, angle)
             cube.rotate(axis, angle)
         })
+    }
+
+
+    public addTurnEventListener(listener: (event: TurnEvent) => void) {
+        this._listeners.add(listener)
+    }
+
+    public removeTurnEventListener(listener: (event: TurnEvent) => void) {
+        this._listeners.delete(listener)
+    }
+
+    private _dispatchTurnEvent(axis: Axis, index: number, angle: number) {
+        const event: TurnEvent = {axis, index, angle}
+        this._listeners.forEach(listener => listener(event))
     }
 }
 

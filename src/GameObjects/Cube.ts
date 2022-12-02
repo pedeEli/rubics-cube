@@ -239,7 +239,7 @@ class Cube implements GameObject {
             this.transform.rotation = this._targetRotation
             return
         }
-        this.transform.rotation = Quaternion.lerp(this._initialRotation, this._targetRotation, this._turnProgress)
+        this.transform.rotation = Quaternion.slerp(this._initialRotation, this._targetRotation, this._turnProgress)
     }
 }
 

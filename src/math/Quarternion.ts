@@ -38,14 +38,27 @@ class Quaternion {
         return new Quaternion(this.real, this.im.negate).mult(new Quaternion(0, v)).mult(this).im
     }
 
+    public get conjugate() {
+        return new Quaternion(this.real, this.im.negate)
+    }
+    public get mag() {
+        return Math.sqrt(this.real * this.real + this.im.squareMag)
+    }
+
+    public power(n: number) {
+        const {mag} = this
+        const phi = Math.acos(this.real / mag)
+        const unit = this.im.normalized
+        const scalar = Math.pow(mag, n)
+        return new Quaternion(scalar * Math.cos(phi * n), unit.scale(scalar * Math.sin(phi * n)))
+    }
+
     public static get identity() {
         return new Quaternion(1, V3.zero)
     }
 
-    public static lerp(q1: Quaternion, q2: Quaternion, t: number) {
-        const real = q1.real + (q2.real - q1.real) * t
-        const im = V3.lerp(q1.im, q2.im, t)
-        return new Quaternion(real, im)
+    public static slerp(q1: Quaternion, q2: Quaternion, t: number) {
+        return q1.mult(q1.conjugate.mult(q2).power(t))
     }
 }
 

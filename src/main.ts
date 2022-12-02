@@ -87,3 +87,8 @@ const loop = () => {
   requestAnimationFrame(loop)
 }
 requestAnimationFrame(loop)
+
+
+import {State} from './State/State'
+
+const state = new State()
